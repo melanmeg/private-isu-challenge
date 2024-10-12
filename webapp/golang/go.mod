@@ -13,6 +13,8 @@ require (
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/felixge/fgprof v0.9.5 // indirect
+	github.com/google/pprof v0.0.0-20240227163752-401108e1b7e7 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/memcachier/mc v2.0.1+incompatible // indirect
 )

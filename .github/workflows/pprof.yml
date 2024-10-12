@@ -19,4 +19,5 @@ jobs:
           port: 22
           script: |
             sleep 7
-            sudo curl -o /tmp/cpu.pprof http://localhost:6060/debug/pprof/profile?seconds=60
+            # sudo curl -o /tmp/cpu.pprof http://localhost:6060/debug/pprof/profile?seconds=60
+            curl -o /tmp/cpu_$$(date +"%Y-%m-%d-%H-%M-%S").pprof http://localhost:6060/debug/fgprof?seconds=60

@@ -12,6 +12,14 @@
     line: "bind socket to IP = 0.0.0.0"
   ignore_errors: yes
 
+# ダッシュボード機能が使えないのでコメントアウト
+# - name: Copy html
+#   become: true
+#   ansible.builtin.copy:
+#     src: ../../files/netdata/isucon.html
+#     dest: /var/lib/netdata/www/isucon.html
+#     mode: "0644"
+
 - name: netdata is running
   systemd:
     name: netdata
@@ -24,3 +32,4 @@
     name: netdata
     state: restarted
   ignore_errors: yes
+# https://repo.netdata.cloud/repos/stable/ubuntu/noble/netdata_1.47.4%2Bubuntu24.04_amd64.deb

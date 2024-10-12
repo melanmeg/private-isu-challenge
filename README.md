@@ -44,7 +44,8 @@ $ sudo systemctl restart mysql
 
 
 ## 参考
-- https://github.com/kazeburo/private-isu-challenge
-- https://github.com/kaz/pprotein
-- https://trap.jp/post/1710/
-- https://github.com/kaz/pprotein
+- [kazeburo/private-isu-challenge](https://github.com/kazeburo/private-isu-challenge)
+- [kaz/pprotein](https://github.com/kaz/pprotein)
+- [ISUCON12で2位になりました(織時屋)](https://trap.jp/post/1710/)
+- [ISUCON12で優勝しました(チーム NaruseJun)](https://zenn.dev/tohutohu/articles/8c34d1187e1b21)
+- [ISUCON13で優勝しました(チーム NaruseJun)](https://zenn.dev/tohutohu/articles/923bdf5dcd73af)

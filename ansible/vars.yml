@@ -1,7 +1,7 @@
 var:
   isu1:
     tasks:
-      # - isu/isu_deploy.yml
+      - isu/isu_deploy.yml
     tools:
       # - tools/alp.yml
       # - tools/collect.yml
