@@ -1,0 +1,72 @@
+- name: isu-ruby is disabled
+  become: yes
+  systemd:
+    name: isu-ruby
+    state: stopped
+    enabled: false
+
+- name: "{{ SERVICE_NAME }} is running"
+  become: yes
+  systemd:
+    name: "{{ SERVICE_NAME }}"
+    state: started
+    enabled: true
+
+- name: Pull latest code from Git repository
+  git:
+    repo: "{{ GIT_REPOSITORY_URL }}"
+    dest: "{{ ISUCON_DIR }}"
+    version: "main"
+    force: true
+
+- name: setup
+  shell: sudo -u {{ ISUCON_USER }} bash -lc "sh setup.sh"
+  args:
+    chdir: "{{ ISUCON_DIR }}/webapp/golang/"
+
+- name: "{{ SERVICE_NAME }} is restarted"
+  become: yes
+  systemd:
+    name: "{{ SERVICE_NAME }}"
+    state: restarted
+
+- name: remove
+  become: yes
+  file:
+    path: /var/log/nginx/access.log
+    state: absent
+
+- name: nginx is restarted
+  become: yes
+  systemd:
+    name: nginx
+    state: restarted
+
+- name: remove
+  become: yes
+  file:
+    path: /var/log/mysql/mysql-slow.sql
+    state: absent
+
+#- name: chmod
+#  file:
+#    path: "{{ ISUCON_DIR }}/webapp/sql/init.sh"
+#    mode: '0755'
+#  ignore_errors: yes
+
+#- name: shell
+#  shell: "sh {{ ISUCON_DIR }}/webapp/sql/init.sh"
+#  ignore_errors: yes
+
+- name: mysql is restarted
+  become: yes
+  systemd:
+    name: mysql
+    state: restarted
+
+# - name: redis is restarted
+#   become: yes
+#   systemd:
+#     name: redis-server
+#     state: restarted
+#   ignore_errors: yes

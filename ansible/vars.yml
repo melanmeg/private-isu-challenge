@@ -1,0 +1,22 @@
+var:
+  isu1:
+    tasks:
+      # - isu/isu_deploy.yml
+    tools:
+      # - tools/alp.yml
+      # - tools/collect.yml
+      # - tools/delve.yml
+      # - tools/fetch.yml
+      # - tools/graphviz.yml
+      # - tools/mysql.yml
+      # - tools/netdata.yml
+      # - tools/nginx.yml
+      # - tools/percona.yml
+      # - tools/redis.yml
+      # - tools/sysctl.yml
+  isu2:
+    tasks:
+    tools:
+  isu3:
+    tasks:
+    tools:

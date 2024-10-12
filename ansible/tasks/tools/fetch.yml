@@ -1,0 +1,35 @@
+- name: Archive nginx directory
+  ansible.builtin.command:
+    cmd: "tar -czf /tmp/nginx.tar.gz -C /etc nginx"
+  ignore_errors: true
+
+- name: fetch nginx
+  ansible.builtin.fetch:
+    src: "/tmp/nginx.tar.gz"
+    dest: "../files/fetch/nginx.tar.gz"
+    flat: true
+  ignore_errors: true
+
+- name: Archive mysql directory
+  ansible.builtin.command:
+    cmd: "tar -czf /tmp/mysql.tar.gz -C /etc mysql"
+  ignore_errors: true
+
+- name: fetch mysql
+  ansible.builtin.fetch:
+    src: "/tmp/mysql.tar.gz"
+    dest: "../files/fetch/mysql.tar.gz"
+    flat: true
+  ignore_errors: true
+
+- name: Archive service directory
+  ansible.builtin.command:
+    cmd: "tar -czf /tmp/service.tar.gz -C /etc/systemd system"
+  ignore_errors: true
+
+- name: fetch service
+  ansible.builtin.fetch:
+    src: "/tmp/service.tar.gz"
+    dest: "../files/fetch/service.tar.gz"
+    flat: true
+  ignore_errors: true

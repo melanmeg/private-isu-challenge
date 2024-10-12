@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "/home/isucon/webapp/go",
+      "env": {
+        "ISUCON13_POWERDNS_SUBDOMAIN_ADDRESS": "127.0.0.1"
+      },
+      "args": []
+    }
+  ]
+}

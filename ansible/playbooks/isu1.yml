@@ -1,0 +1,27 @@
+- name: isu1 deploy
+  hosts: isu1
+  gather_facts: false
+  user: "{{ ISUCON_USER }}"
+  become: false
+  max_fail_percentage: 0
+  vars_files:
+    - ../env.yml
+    - ../vars.yml
+  tasks:
+    - include_tasks: "../tasks/{{ item }}"
+      with_items: "{{ var.isu1.tasks }}"
+      when: var.isu1.tasks
+
+- name: isu1 tools
+  hosts: isu1
+  gather_facts: false
+  user: "{{ ISUCON_USER }}"
+  become: true
+  max_fail_percentage: 0
+  vars_files:
+    - ../env.yml
+    - ../vars.yml
+  tasks:
+    - include_tasks: "../tasks/{{ item }}"
+      with_items: "{{ var.isu1.tools }}"
+      when: var.isu1.tools
