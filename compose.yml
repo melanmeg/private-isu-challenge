@@ -1,0 +1,34 @@
+services:
+  mock:
+    build:
+      context: .
+      dockerfile: mock.Dockerfile
+    image: mock:latest
+    container_name: mock
+    hostname: mock
+
+  pprotein:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pprotein:latest
+    container_name: pprotein
+    hostname: pprotein
+    depends_on:
+      - mock
+    ports:
+      - 9000:9000
+    network_mode: host
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin
+    hostname: phpmyadmin
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY=1
+
+networks:
+  default:
+    name: isucon
