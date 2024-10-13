@@ -23,6 +23,11 @@
 {"pass":true,"score":36243,"success":34161,"fail":0,"messages":[]}
 ```
 
+### LIMIT 20
+```bash
+{"pass":true,"score":43344,"success":41806,"fail":133,"messages":["1ページに表示される画像の数が足りません (GET /)"]}
+```
+
 ## 環境構築
 - https://gist.github.com/melanmeg/41e5f575b494ca83b7ca8ba76c91cd05
 
