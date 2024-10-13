@@ -10,7 +10,7 @@
   ignore_errors: true
 
 - name: shell
-  shell: bash /tmp/collect.sh
+  shell: bash /tmp/collect.sh | tee /tmp/collect.log
   register: result
   changed_when: false
 - name: show stdout
@@ -21,3 +21,10 @@
   file:
     path: /tmp/collect.sh
     state: absent
+
+- name: fetch service
+  ansible.builtin.fetch:
+    src: /tmp/collect.log
+    dest: ../files/fetch/collect.log
+    flat: true
+  ignore_errors: true

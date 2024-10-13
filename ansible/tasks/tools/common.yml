@@ -1,0 +1,32 @@
+- name: Purge the package "needrestart"
+  apt:
+    name: needrestart
+    state: absent
+    purge: true
+    autoremove: true
+
+- name: Update Upgrade
+  apt:
+    upgrade: false
+    update_cache: true
+
+- name: set inputrc
+  lineinfile:
+    dest: /etc/inputrc
+    insertafter: EOF
+    line: "{{ item }}"
+  with_items:
+    - "set bell-style none"
+
+- name: Change hostname
+  hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Update /etc/hosts with new hostname and additional lines
+  blockinfile:
+    path: /etc/hosts
+    block: |
+      {{ ISU1_ADDRESS }} {{ ISU1_HOSTNAME }}
+      {{ ISU2_ADDRESS }} {{ ISU2_HOSTNAME }}
+      {{ ISU3_ADDRESS }} {{ ISU3_HOSTNAME }}
+    state: present

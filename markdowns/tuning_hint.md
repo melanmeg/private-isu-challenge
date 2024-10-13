@@ -10,16 +10,16 @@
 
 1. ローカルにclone `git clone https://github.com/kaz/pprotein.git`
 2. ローカルでcompose up
+  - `network_mode: host` を追加
 3. SSHポートフォワーディング
-  - ssh -fN -L 9000:localhost:9000 isu1
-  - ssh -fN -L 9000:localhost:9000 isu2
-  - ssh -fN -L 9000:localhost:9000 isu3
+  - ssh -fN -L 19000:localhost:19000 isu1
+  - ssh -fN -L 6060:localhost:6060 isu1
 4. 以下手順実施
 
 - 依存ツールのインストール
 ```bash
 # Goパッケージインストール
-go get "github.com/kaz/pprotein/integration"
+go get github.com/kaz/pprotein
 
 # pprofのグラフ描画に使うgraphviz
 sudo apt install -y graphviz gv
@@ -37,9 +37,10 @@ sudo mv alp /usr/local/bin/alp
 # pprotein本体
 wget https://github.com/kaz/pprotein/releases/download/v1.2.3/pprotein_1.2.3_linux_amd64.tar.gz
 tar -xvf pprotein_1.2.3_linux_amd64.tar.gz
+mv pprotein-agent /home/isucon/pprotein-agent
 ```
 
-- pprotein-agentのserviceを起動
+- pprotein-agentのserviceを起動 `sudo vim /etc/systemd/system/pprotein-agent.service`
 ```
 [Unit]
 Description=pprotein-agent service
@@ -80,7 +81,7 @@ import (
 )
 
 func main() {
-  standalone.Integrate(":19000")
+  standalone.Integrate(":6060")
 }
 ```
 
@@ -90,20 +91,20 @@ func main() {
   {
     "Type": "pprof",
     "Label": "webapp",
-    "URL": "http://192.168.0.11:8080/debug/pprof/profile",
-    "Duration": 60
+    "URL": "http://localhost:6060/debug/pprof/profile",
+    "Duration": 10
   },
   {
     "Type": "httplog",
     "Label": "nginx",
-    "URL": "http://192.168.0.11:8080/debug/log/httplog",
-    "Duration": 60
+    "URL": "http://localhost:19000/debug/log/httplog",
+    "Duration": 10
   },
   {
     "Type": "slowlog",
     "Label": "mysql",
-    "URL": "http://192.168.0.12:19000/debug/log/slowlog",
-    "Duration": 60
+    "URL": "http://localhost:19000/debug/log/slowlog",
+    "Duration": 10
   }
 ]
 ```

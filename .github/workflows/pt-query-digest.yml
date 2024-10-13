@@ -18,5 +18,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            sudo sed -i '/^INSERT INTO `posts`/d' /var/log/mysql/mysql-slow.sql
-            sudo pt-query-digest /var/log/mysql/mysql-slow.sql
+            sudo sed -i '/^INSERT INTO `posts`/d' /var/log/mysql/mysql-slow.log
+            sudo pt-query-digest /var/log/mysql/mysql-slow.log
