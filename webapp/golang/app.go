@@ -799,7 +799,6 @@ func main() {
 	// go func() {
 	// 	log.Println(http.ListenAndServe(":6060", nil))
 	// }()
-	standalone.Integrate(":6060")
 
 	host := os.Getenv("ISUCONP_DB_HOST")
 	if host == "" {
@@ -859,5 +858,12 @@ func main() {
 		http.FileServer(http.Dir("../public")).ServeHTTP(w, r)
 	})
 
+	// pproteinデバッグサーバーを起動
+	go func() {
+		log.Println("Starting pprotein debug server on :6060")
+		standalone.Integrate(":6060")
+	}()
+
+	// メインのHTTPサーバーを起動
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
