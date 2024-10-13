@@ -12,6 +12,13 @@
     line: "bind socket to IP = 0.0.0.0"
   ignore_errors: yes
 
+- name: Copy html
+  become: true
+  ansible.builtin.copy:
+    src: ../../files/netdata/isucon.html
+    dest: /var/lib/netdata/www/isucon.html
+    mode: "0644"
+
 - name: netdata is running
   systemd:
     name: netdata
