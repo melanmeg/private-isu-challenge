@@ -19,7 +19,7 @@
 - 依存ツールのインストール
 ```bash
 # Goパッケージインストール
-go get "github.com/kaz/pprotein/integration/echov4"
+go get "github.com/kaz/pprotein/integration"
 
 # pprofのグラフ描画に使うgraphviz
 sudo apt install -y graphviz gv
@@ -76,7 +76,7 @@ func main() {
 - Goにコードを仕込む（standaloneの場合）
 ```golang
 import (
-  "github.com/kaz/pprotein/integration"
+  "github.com/kaz/pprotein/integration/standalone"
 )
 
 func main() {
