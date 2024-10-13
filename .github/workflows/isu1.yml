@@ -1,4 +1,4 @@
-name: 'isu1'
+name: "isu1"
 on:
   workflow_dispatch:
 jobs:
@@ -17,7 +17,9 @@ jobs:
           directory: ./ansible
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           inventory: |
-            [isu1]
-            ${{ vars.HOST1 }}
+            [isucon]
+            isu1 ansible_host=${{ vars.HOST1 }}
+            isu2 ansible_host=${{ vars.HOST2 }}
+            isu3 ansible_host=${{ vars.HOST3 }}
           options: |
             --inventory .hosts
