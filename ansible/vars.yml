@@ -1,16 +1,16 @@
 var:
   isu1:
     tasks:
-      # - isu/isu_deploy.yml
+      - isu/isu_deploy.yml
     tools:
-      # - tools/common.yml
-      # - tools/graphviz.yml
-      # - tools/nginx.yml
-      # - tools/mysql.yml
-      # - tools/alp.yml
-      # - tools/slp.yml
-      # - tools/pprotein-agent.yml
-      # - tools/sysctl.yml
+      - tools/common.yml
+      - tools/graphviz.yml
+      - tools/nginx.yml
+      - tools/mysql.yml
+      - tools/alp.yml
+      - tools/slp.yml
+      - tools/pprotein-agent.yml
+      - tools/sysctl.yml
 
       # ------------------------------
       # - tools/alp.yml

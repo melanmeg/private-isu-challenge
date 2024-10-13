@@ -32,10 +32,13 @@ $ sudo apt update -y
 
 - メモ
 ```bash
-$ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index post_index(post_id, created_at DESC);"
 $ mysql -u isuconp -pisuconp isuconp -e "alter table posts add index posts_order_idx (created_at DESC);"
+EXPLAIN SELECT `id`, `user_id`, `body`, `mime`, `created_at` FROM `posts` ORDER BY `created_at` DESC;
+$ mysql -u isuconp -pisuconp isuconp -e "alter table posts add index posts_user_idx (user_id, created_at DESC);"
+EXPLAIN SELECT `id`, `user_id`, `body`, `mime`, `created_at` FROM `posts` ORDER BY `created_at` DESC;
+
+$ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index post_index(post_id, created_at DESC);"
 $ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index idx_user_id (user_id);"
-$ mysql -u isuconp -pisuconp isuconp -e "alter table posts add index posts_user_idx (user_id,created_at DESC);"
 $ sudo systemctl restart mysql
 
 $ go get github.com/redis/go-redis/v8
