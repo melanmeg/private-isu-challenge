@@ -13,6 +13,11 @@
 {"pass":true,"score":34655,"success":32526,"fail":0,"messages":[]}
 ```
 
+### 静的ファイルをキャッシュ
+```bash
+{"pass":true,"score":35412,"success":33324,"fail":0,"messages":[]}
+```
+
 ## 環境構築
 - https://gist.github.com/melanmeg/41e5f575b494ca83b7ca8ba76c91cd05
 

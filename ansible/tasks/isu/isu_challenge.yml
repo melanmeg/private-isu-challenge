@@ -6,8 +6,8 @@
 - name: Copy
   become: true
   copy:
-    src: ../../files/nginx/site-available/isucon.conf
-    dest: /etc/nginx/site-available/isucon.conf
+    src: ../../files/nginx/sites-available/isucon.conf
+    dest: /etc/nginx/sites-available/isucon.conf
     mode: "0644"
     backup: true
 
