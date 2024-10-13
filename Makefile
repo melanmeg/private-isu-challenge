@@ -28,10 +28,10 @@ deploy:
 	make -C $(BUILD_DIR)
 	sudo systemctl restart $(SERVICE_NAME)
 	# nginx
-	rm -f $(NGINX_LOG)
+	sudo rm -f $(NGINX_LOG)
 	sudo systemctl restart nginx
 	# mysql
-	rm -f $(DB_SLOW_LOG)
+	sudo rm -f $(DB_SLOW_LOG)
 	sudo systemctl restart mysql
 
 
@@ -100,8 +100,8 @@ git-setup:
 .PHONY: go-reinstall
 go-reinstall:
 	sudo rm -rf /usr/local/go
-	TAR_FILENAME=$(curl 'https://go.dev/dl/?mode=json' | jq -r '.[0].files[] | select(.os == "linux" and .arch == "amd64" and .kind == "archive") | .filename')
-	URL="https://go.dev/dl/$TAR_FILENAME"
-	curl -fsSL "$URL" -o /tmp/go.tar.gz
+	$(eval TAR_FILENAME := $(shell curl -fsSL 'https://go.dev/dl/?mode=json' | jq -r '.[0].files[] | select(.os == "linux" and .arch == "amd64" and .kind == "archive") | .filename'))
+	$(eval URL := $(shell echo https://go.dev/dl/$(TAR_FILENAME)))
+	curl -fsSL $(URL) -o /tmp/go.tar.gz
 	sudo tar -C /usr/local -xzf /tmp/go.tar.gz
 	rm -f /tmp/go.tar.gz

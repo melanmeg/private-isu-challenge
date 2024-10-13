@@ -111,22 +111,16 @@ func main() {
 
 - httplog/config の設定
 ```
+sort: sum # max|min|avg|sum|count|uri|method|max-body|min-body|avg-body|sum-body|p1|p50|p99|stddev
+reverse: true
+query_string: true
+output: count,5xx,4xx,method,uri,min,max,sum,avg,p99
+
 matching_groups:
-    - ^/api/user/[0-9a-zA-Z_-]+/theme$
-    - ^/api/user/[0-9a-zA-Z_-]+/livestream$
-    - ^/api/livestream/[0-9a-f_-]+$
-    - ^/api/livestream/[0-9a-f_-]+/livecomment$
-    - ^/api/livestream/[0-9a-f_-]+/reaction$
-    - ^/api/livestream/[0-9a-f_-]+/report$
-    - ^/api/livestream/[0-9a-f_-]+/ngwords$
-    - ^/api/livestream/[0-9a-f_-]+/livecomment/[0-9a-f_-]+/report$
-    - ^/api/livestream/[0-9a-f_-]+/moderate$
-    - ^/api/livestream/[0-9a-f_-]+/enter$
-    - ^/api/livestream/[0-9a-f_-]+/exit$
-    - ^/api/user/[0-9a-zA-Z_-]+$
-    - ^/api/user/[0-9a-zA-Z_-]+/statistics$
-    - ^/api/user/[0-9a-zA-Z_-]+/icon$
-    - ^/api/livestream/[0-9a-f_-]+/statistics$
+  - ^/image/[0-9]+$
+  - ^/image/[0-9]+\..+$
+  - ^/posts/[0-9]+$
+  - ^/@\w$
 ```
 
 - slowlog/config の設定

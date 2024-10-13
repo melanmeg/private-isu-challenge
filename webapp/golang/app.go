@@ -23,8 +23,6 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/jmoiron/sqlx"
 	"github.com/kaz/pprotein/integration/standalone"
-	// _ "net/http/pprof"
-	// "github.com/felixge/fgprof"
 )
 
 var (
@@ -794,12 +792,8 @@ func postAdminBanned(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/admin/banned", http.StatusFound)
 }
 
+// main関数
 func main() {
-	// http.DefaultServeMux.Handle("/debug/fgprof", fgprof.Handler())
-	// go func() {
-	// 	log.Println(http.ListenAndServe(":6060", nil))
-	// }()
-
 	host := os.Getenv("ISUCONP_DB_HOST")
 	if host == "" {
 		host = "localhost"
