@@ -22,9 +22,9 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/sessions"
 	"github.com/jmoiron/sqlx"
-
-	_ "net/http/pprof"
-	"github.com/felixge/fgprof"
+	"github.com/kaz/pprotein/integration/standalone"
+	// _ "net/http/pprof"
+	// "github.com/felixge/fgprof"
 )
 
 var (
@@ -795,10 +795,11 @@ func postAdminBanned(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.DefaultServeMux.Handle("/debug/fgprof", fgprof.Handler())
-	go func() {
-		log.Println(http.ListenAndServe(":6060", nil))
-	}()
+	// http.DefaultServeMux.Handle("/debug/fgprof", fgprof.Handler())
+	// go func() {
+	// 	log.Println(http.ListenAndServe(":6060", nil))
+	// }()
+	standalone.Integrate(":19000")
 
 	host := os.Getenv("ISUCONP_DB_HOST")
 	if host == "" {
