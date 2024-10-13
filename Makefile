@@ -28,10 +28,10 @@ deploy:
 	make -C $(BUILD_DIR)
 	sudo systemctl restart $(SERVICE_NAME)
 	# nginx
-	rm -f $(NGINX_LOG)
+	sudo rm -f $(NGINX_LOG)
 	sudo systemctl restart nginx
 	# mysql
-	rm -f $(DB_SLOW_LOG)
+	sudo rm -f $(DB_SLOW_LOG)
 	sudo systemctl restart mysql
 
 
