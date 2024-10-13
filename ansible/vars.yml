@@ -1,10 +1,11 @@
 var:
   isu1:
     tasks:
-      - isu/isu_deploy.yml
+      # - isu/isu_deploy.yml
     tools:
       # - tools/alp.yml
       # - tools/collect.yml
+      # - tools/common.yml
       # - tools/delve.yml
       # - tools/fetch.yml
       # - tools/graphviz.yml
@@ -12,7 +13,9 @@ var:
       # - tools/netdata.yml
       # - tools/nginx.yml
       # - tools/percona.yml
+      # - tools/pprotein-agent.yml
       # - tools/redis.yml
+      # - tools/slp.yml
       # - tools/sysctl.yml
   isu2:
     tasks:

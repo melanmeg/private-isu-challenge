@@ -2,3 +2,4 @@
   apt:
     name:
       - graphviz
+      - gv

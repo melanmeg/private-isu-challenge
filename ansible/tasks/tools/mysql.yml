@@ -20,7 +20,7 @@
 
 - name: remove file
   file:
-    path: /var/log/mysql/mysql-slow.sql
+    path: /var/log/mysql/mysql-slow.log
     state: absent
 
 - name: shell

@@ -10,7 +10,7 @@
     insertafter: EOF
     regexp: '^#?\s*bind socket to IP'
     line: "bind socket to IP = 0.0.0.0"
-  ignore_errors: yes
+  ignore_errors: true
 
 # ダッシュボード機能が使えないのでコメントアウト
 # - name: Copy html
@@ -25,11 +25,11 @@
     name: netdata
     state: started
     enabled: true
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: netdata is restarted
   systemd:
     name: netdata
     state: restarted
-  ignore_errors: yes
+  ignore_errors: true
 # https://repo.netdata.cloud/repos/stable/ubuntu/noble/netdata_1.47.4%2Bubuntu24.04_amd64.deb

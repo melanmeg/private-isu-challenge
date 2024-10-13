@@ -1,0 +1,12 @@
+[Unit]
+Description=pprotein-agent service
+
+[Service]
+ExecStart=/home/isucon/pprotein-agent
+WorkingDirectory=/home/isucon
+Environment=PATH=$PATH:/usr/local/bin
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target

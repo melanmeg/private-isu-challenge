@@ -40,8 +40,8 @@ sudo cat /var/log/nginx/access.log \
 ### pt-query-digest
 
 ```bash
-#sudo sed -i '/^INSERT INTO `posts`/d' /var/log/mysql/mysql-slow.sql
-sudo pt-query-digest /var/log/mysql/mysql-slow.sql
+#sudo sed -i '/^INSERT INTO `posts`/d' /var/log/mysql/mysql-slow.log
+sudo pt-query-digest /var/log/mysql/mysql-slow.log
 ```
 
 ---
@@ -55,6 +55,15 @@ sudo go tool pprof -http localhost:1080 cpu.pprof
 ssh -N -L 0.0.0.0:1080:localhost:1080 isu1
 http://localhost:1080/
 #http://192.168.11.21:1080/
+```
+
+---
+
+### Golang
+
+```bash
+go get github.com/go-delve/delve/cmd/dlv
+go get github.com/kaz/pprotein
 ```
 
 ---

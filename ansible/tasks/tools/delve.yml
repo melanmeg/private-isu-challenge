@@ -1,4 +1,0 @@
-- name: setup
-  shell: sudo -u {{ ISUCON_USER }} bash -lc "go get github.com/go-delve/delve/cmd/dlv"
-  args:
-    chdir: "{{ BUILD_DIR }}"
