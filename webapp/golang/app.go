@@ -212,6 +212,7 @@ func makePosts(results []Post, csrfToken string, allComments bool) ([]Post, erro
 
 		p.CSRFToken = csrfToken
 
+		// p.User.DelFlg == 0 の行だけ結果に追加
 		if p.User.DelFlg == 0 {
 			posts = append(posts, p)
 		}
@@ -387,7 +388,14 @@ func getIndex(w http.ResponseWriter, r *http.Request) {
 
 	results := []Post{}
 
-	err := db.Select(&results, "SELECT `id`, `user_id`, `body`, `mime`, `created_at` FROM `posts` ORDER BY `created_at` DESC LIMIT 20")
+	err := db.Select(&results, `
+		SELECT p.id, p.user_id, p.body, p.mime, p.created_at
+		FROM posts AS p
+		JOIN users AS u ON (p.user_id = u.id)
+		WHERE u.del_flg = 0
+		ORDER BY p.created_at DESC
+		LIMIT 20
+	`)
 	if err != nil {
 		log.Print(err)
 		return
