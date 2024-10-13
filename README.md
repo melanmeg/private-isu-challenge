@@ -8,9 +8,14 @@
 {"pass":true,"score":4366,"success":4205,"fail":0,"messages":[]}
 ```
 
-### post_index 追加
+### post_id_index 追加
 ```bash
 {"pass":true,"score":34655,"success":32526,"fail":0,"messages":[]}
+```
+
+### 静的ファイルをキャッシュ
+```bash
+{"pass":true,"score":35412,"success":33324,"fail":0,"messages":[]}
 ```
 
 ## 環境構築
@@ -32,12 +37,14 @@ $ sudo apt update -y
 
 - メモ
 ```bash
+$ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index post_id_index (post_id, created_at DESC);"
+
+EXPLAIN SELECT `id`, `user_id`, `body`, `mime`, `created_at` FROM `posts` ORDER BY `created_at` DESC;
 $ mysql -u isuconp -pisuconp isuconp -e "alter table posts add index posts_order_idx (created_at DESC);"
 EXPLAIN SELECT `id`, `user_id`, `body`, `mime`, `created_at` FROM `posts` ORDER BY `created_at` DESC;
 $ mysql -u isuconp -pisuconp isuconp -e "alter table posts add index posts_user_idx (user_id, created_at DESC);"
 EXPLAIN SELECT `id`, `user_id`, `body`, `mime`, `created_at` FROM `posts` ORDER BY `created_at` DESC;
 
-$ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index post_index(post_id, created_at DESC);"
 $ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index idx_user_id (user_id);"
 $ sudo systemctl restart mysql
 
