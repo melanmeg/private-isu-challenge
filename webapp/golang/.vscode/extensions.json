@@ -1,3 +1,7 @@
 {
-  "recommendations": ["go.dev", "gitkraken.com"]
+  "recommendations": [
+    "golang.go",
+    "go.dev",
+    "gitkraken.com"
+  ]
 }

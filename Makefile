@@ -61,16 +61,22 @@ slow-query2:
 # pprofで記録する
 .PHONY: pprof
 pprof:
-	echo "start pprof-record"
-	go tool pprof -top http://localhost:6060/debug/fgprof
-	$(eval latest := $(shell ls -rt pprof/ | tail -n 1))
-	echo "finish pprof-record\ncreated: $(latest)"
+	curl -o pprof/cpu_$$(date +"%Y-%m-%d-%H-%M-%S").pprof http://localhost:6060/debug/pprof/profile?seconds=60
+
+.PHONY: fgprof
+fgprof:
+	curl -o pprof/cpu_$$(date +"%Y-%m-%d-%H-%M-%S").pprof http://localhost:6060/debug/fgprof?seconds=6
 
 # pprofで確認する
 .PHONY: pprof-check
 pprof-check:
 	$(eval latest := $(shell ls -rt pprof/ | tail -n 1))
-	go tool pprof -http=localhost:8090 pprof/$(latest)
+	go tool pprof -http localhost:1080 /pprof/$(latest)
+
+.PHONY: fgprof-check
+fgprof-check:
+	$(eval latest := $(shell ls -rt pprof/ | tail -n 1))
+	go tool pprof -http localhost:1080 pprof/$(latest)
 
 
 # DBに接続する

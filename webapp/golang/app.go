@@ -24,6 +24,7 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	_ "net/http/pprof"
+	"github.com/felixge/fgprof"
 )
 
 var (
@@ -794,8 +795,9 @@ func postAdminBanned(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	http.DefaultServeMux.Handle("/debug/fgprof", fgprof.Handler())
 	go func() {
-		log.Println(http.ListenAndServe("localhost:6060", nil))
+		log.Println(http.ListenAndServe(":6060", nil))
 	}()
 
 	host := os.Getenv("ISUCONP_DB_HOST")
