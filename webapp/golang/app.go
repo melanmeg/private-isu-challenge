@@ -799,7 +799,7 @@ func main() {
 	// go func() {
 	// 	log.Println(http.ListenAndServe(":6060", nil))
 	// }()
-	standalone.Integrate(":19000")
+	standalone.Integrate(":6060")
 
 	host := os.Getenv("ISUCONP_DB_HOST")
 	if host == "" {
