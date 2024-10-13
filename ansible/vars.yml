@@ -2,6 +2,7 @@ var:
   isu1:
     tasks:
       - isu/isu_deploy.yml
+      - isu/isu_challenge.yml
     tools:
       - tools/common.yml
       - tools/collect.yml
