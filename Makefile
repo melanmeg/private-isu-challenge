@@ -1,6 +1,3 @@
-include env
-ENV_FILE:=env
-
 # 変数定義 ------------------------
 
 USER:=isucon
