@@ -12,9 +12,8 @@
 2. ローカルでcompose up
   - `network_mode: host` を追加
 3. SSHポートフォワーディング
-  - ssh -fN -L 19000:localhost:19000 isu-01
-  - ssh -fN -L 19000:localhost:19000 isu-02
-  - ssh -fN -L 19000:localhost:19000 isu-03
+  - ssh -fN -L 19000:localhost:19000 isu1
+  - ssh -fN -L 6060:localhost:6060 isu1
 4. 以下手順実施
 
 - 依存ツールのインストール
@@ -92,7 +91,7 @@ func main() {
   {
     "Type": "pprof",
     "Label": "webapp",
-    "URL": "http://localhost:19000/debug/pprof/profile",
+    "URL": "http://localhost:6060/debug/pprof/profile",
     "Duration": 10
   },
   {
