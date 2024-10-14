@@ -48,6 +48,11 @@
 {"pass":true,"score":103296,"success":99339,"fail":0,"messages":[]}
 ```
 
+### 1.コメントとユーザー情報をバッチで取得。2.データ構造のマッピング。3.コードの読みやすさと保守性を向上。by ChatGPT
+```bash
+{"pass":true,"score":162687,"success":156868,"fail":0,"messages":[]}
+```
+
 ## 環境構築
 - https://gist.github.com/melanmeg/41e5f575b494ca83b7ca8ba76c91cd05
 
