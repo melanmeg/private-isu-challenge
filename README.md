@@ -33,6 +33,11 @@
 {"pass":true,"score":44437,"success":41681,"fail":0,"messages":[]}
 ```
 
+### 画像ファイル取得時と同時にすべて書き出す。/image/* にマッチするリクエストを画像ファイルが存在する場合はそのファイルを返す（キャッシュも有効）
+```bash
+{"pass":true,"score":88500,"success":84534,"fail":0,"messages":[]}
+```
+
 ## 環境構築
 - https://gist.github.com/melanmeg/41e5f575b494ca83b7ca8ba76c91cd05
 
@@ -59,10 +64,6 @@ $ mysql -u isuconp -pisuconp isuconp -e "alter table posts add index posts_order
 $ mysql -u isuconp -pisuconp isuconp -e "alter table posts add index posts_user_idx (user_id, created_at DESC);"
 
 $ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index idx_user_id (user_id);"
-$ sudo systemctl restart mysql
-
-$ go get github.com/redis/go-redis/v8
-$ sudo systemctl restart mysql
 ```
 
 
