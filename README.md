@@ -53,6 +53,11 @@
 {"pass":true,"score":162687,"success":156868,"fail":0,"messages":[]}
 ```
 
+### たぶん不要だったカラム削除
+```bash
+{"pass":true,"score":161000,"success":155095,"fail":0,"messages":[]}
+```
+
 ## 環境構築
 - https://gist.github.com/melanmeg/41e5f575b494ca83b7ca8ba76c91cd05
 
