@@ -8,7 +8,7 @@
 {"pass":true,"score":4366,"success":4205,"fail":0,"messages":[]}
 ```
 
-### post_id_index 追加
+### commentsテーブル post_id_index(変更>idx_post_id_created_at_desc) 追加
 ```bash
 {"pass":true,"score":34655,"success":32526,"fail":0,"messages":[]}
 ```
@@ -18,7 +18,7 @@
 {"pass":true,"score":35412,"success":33324,"fail":0,"messages":[]}
 ```
 
-### posts_order_idx, posts_user_idx 追加
+### postsテーブル posts_order_idx(変更>idx_created_at_desc), posts_user_idx 追加
 ```bash
 {"pass":true,"score":36243,"success":34161,"fail":0,"messages":[]}
 ```
@@ -58,6 +58,12 @@
 {"pass":true,"score":161000,"success":155095,"fail":0,"messages":[]}
 ```
 
+### commentsテーブル idx_user_id 追加
+```bash
+{"pass":true,"score":169587,"success":163265,"fail":0,"messages":[]}
+```
+
+
 ## 環境構築
 - https://gist.github.com/melanmeg/41e5f575b494ca83b7ca8ba76c91cd05
 
@@ -84,6 +90,18 @@ $ mysql -u isuconp -pisuconp isuconp -e "alter table posts add index posts_order
 $ mysql -u isuconp -pisuconp isuconp -e "alter table posts add index posts_user_idx (user_id, created_at DESC);"
 
 $ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index idx_user_id (user_id);"
+
+EXPLAIN SELECT COUNT(*) AS count,
+      c.post_id,
+      c.created_at
+FROM comments c
+WHERE c.post_id IN (1,2,3)
+GROUP BY c.id, c.post_id
+ORDER BY c.created_at DESC;
+
+$ mysql -u isuconp -pisuconp isuconp -e "alter table `comments` add index `idx_user_id` (`user_id`);"
+
+
 ```
 
 
