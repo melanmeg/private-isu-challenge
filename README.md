@@ -43,6 +43,11 @@
 {"pass":true,"score":88500,"success":84534,"fail":0,"messages":[]}
 ```
 
+### コメントを一度に取得を一度に取得してN+1解消
+```bash
+{"pass":true,"score":103296,"success":99339,"fail":0,"messages":[]}
+```
+
 ## 環境構築
 - https://gist.github.com/melanmeg/41e5f575b494ca83b7ca8ba76c91cd05
 
