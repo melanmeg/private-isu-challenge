@@ -173,6 +173,21 @@ func getFlash(w http.ResponseWriter, r *http.Request, key string) string {
 	}
 }
 
+// unique は整数のスライスから重複を取り除く関数です
+func unique(intSlice []int) []int {
+	// マップを使って重複を取り除く
+	uniqueMap := make(map[int]struct{})
+	for _, item := range intSlice {
+			uniqueMap[item] = struct{}{}
+	}
+	// マップからユニークな整数をスライスに戻す
+	result := make([]int, 0, len(uniqueMap))
+	for key := range uniqueMap {
+			result = append(result, key)
+	}
+	return result
+}
+
 func makePosts(results []Post, csrfToken string, allComments bool) ([]Post, error) {
 	var posts []Post
 
@@ -192,24 +207,46 @@ func makePosts(results []Post, csrfToken string, allComments bool) ([]Post, erro
 			return nil, err
 		}
 
-		for i := 0; i < len(comments); i++ {
-			err := db.Get(&comments[i].User, "SELECT * FROM `users` WHERE `id` = ?", comments[i].UserID)
-			if err != nil {
-				return nil, err
-			}
-		}
 
+		// ------ ここから ------
+		// 【ユーザー情報を一度に取得してN+1解消】
+		// ユーザーIDのリストを作成
+		userIDs := make([]int, 0)
+		for _, comment := range comments {
+			userIDs = append(userIDs, comment.UserID)
+		}
+		userIDs = append(userIDs, p.UserID) // p.UserID も含める
+		// 重複するユーザーIDを削除
+		userIDs = unique(userIDs)
+		// ユーザー情報を一度に取得
+		var users []User
+		query, args, err := sqlx.In("SELECT * FROM `users` WHERE `id` IN (?)", userIDs)
+		if err != nil {
+			return nil, err
+		}
+		query = db.Rebind(query)
+		err = db.Select(&users, query, args...)
+		if err != nil {
+			return nil, err
+		}
+		// ユーザーIDをキーにしたマップを作成
+		userMap := make(map[int]User)
+		for _, user := range users {
+			userMap[user.ID] = user
+		}
+		// コメントに対応するユーザーをマップから取得
+		for i := 0; i < len(comments); i++ {
+			comments[i].User = userMap[comments[i].UserID]
+		}
 		// reverse
 		for i, j := 0, len(comments)-1; i < j; i, j = i+1, j-1 {
 			comments[i], comments[j] = comments[j], comments[i]
 		}
-
 		p.Comments = comments
+		// p のユーザーをマップから取得
+		p.User = userMap[p.UserID]
+		// ------ ここまで ------
 
-		err = db.Get(&p.User, "SELECT * FROM `users` WHERE `id` = ?", p.UserID)
-		if err != nil {
-			return nil, err
-		}
 
 		p.CSRFToken = csrfToken
 
