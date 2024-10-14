@@ -66,6 +66,7 @@ type Comment struct {
 	Comment   string    `db:"comment"`
 	CreatedAt time.Time `db:"created_at"`
 	User      User
+	Count     int
 }
 
 func init() {
@@ -184,21 +185,16 @@ func makePosts(results []Post, csrfToken string, allComments bool) ([]Post, erro
 
 	// コメントを一度に取得
 	var comments []struct {
-		Count   int       `db:"count"`
-		ID      int       `db:"id"`
-		PostID  int       `db:"post_id"`
-		UserID  int       `db:"user_id"`
-		Comment string    `db:"comment"`
+		Count    int       `db:"count"`
+		PostID   int       `db:"post_id"`
 		CreatedAt time.Time `db:"created_at"`
 	}
 
-	commentQuery := `SELECT COUNT(*) AS count,
-                          c.post_id,
-                          c.created_at
-                   FROM comments c
-                   WHERE c.post_id IN (?)
-                   GROUP BY c.id, c.post_id
-                   ORDER BY c.created_at DESC`
+	commentQuery := `SELECT c.post_id, COUNT(*) AS count, MAX(c.created_at) AS created_at
+                     FROM comments c
+                     WHERE c.post_id IN (?)
+                     GROUP BY c.post_id
+                  `
 	if !allComments {
 		commentQuery += " LIMIT 3" // LIMIT句は適切に調整する必要があります
 	}
@@ -218,10 +214,8 @@ func makePosts(results []Post, csrfToken string, allComments bool) ([]Post, erro
 	commentMap := make(map[int][]Comment)
 	for _, c := range comments {
 		commentMap[c.PostID] = append(commentMap[c.PostID], Comment{
-			ID:        c.ID,
-			PostID:    c.PostID,
-			UserID:    c.UserID,
-			Comment:   c.Comment,
+			PostID:   c.PostID,
+			Count:    c.Count,
 			CreatedAt: c.CreatedAt,
 		})
 	}
