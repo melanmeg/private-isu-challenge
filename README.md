@@ -63,6 +63,10 @@
 {"pass":true,"score":169587,"success":163265,"fail":0,"messages":[]}
 ```
 
+### 不要なカラム削減、ORDER BYなくても良さそうだった。（なぜかスコアさがる...）
+```bash
+{"pass":true,"score":161227,"success":155871,"fail":0,"messages":[]}
+```
 
 ## 環境構築
 - https://gist.github.com/melanmeg/41e5f575b494ca83b7ca8ba76c91cd05
