@@ -2,13 +2,17 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch",
+      "name": "Launch Go",
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "/home/isucon/private-isu/webapp/go",
+      "program": "/home/isucon/private_isu/webapp/golang",
       "env": {
-        "HOST_ADDRESS": "127.0.0.1"
+        "HOST_ADDRESS": "127.0.0.1",
+        "PATH": "/usr/local/bin:/home/isucon/.local/ruby/bin:/home/isucon/.local/node/bin:/home/isucon/.local/python3/bin:/home/isucon/.local/perl/bin:/home/isucon/.local/php/bin:/home/isucon/.local/php/sbin:/home/isucon/.local/go/bin:/home/isucon/.local/scala/bin:/usr/bin/:/bin/:$PATH",
+        "ISUCONP_DB_USER": "isuconp",
+        "ISUCONP_DB_PASSWORD": "isuconp",
+        "ISUCONP_DB_NAME": "isuconp",
       },
       "args": []
     }

@@ -192,20 +192,53 @@ func makePosts(results []Post, csrfToken string, allComments bool) ([]Post, erro
 	var posts []Post
 
 	for _, p := range results {
-		err := db.Get(&p.CommentCount, "SELECT COUNT(*) AS `count` FROM `comments` WHERE `post_id` = ?", p.ID)
-		if err != nil {
-			return nil, err
-		}
-
-		query := "SELECT * FROM `comments` WHERE `post_id` = ? ORDER BY `created_at` DESC"
+		// ------ ここから ------
+		// 【コメントを一度に取得を一度に取得してN+1解消】
+		var comments []Comment
+		// コメント数とコメントを一度に取得するクエリ
+		query := `
+    SELECT COUNT(*) AS count,
+           c.id,
+           c.post_id,
+           c.user_id,
+           c.comment,
+           c.created_at
+    FROM comments c
+    WHERE c.post_id = ?
+    GROUP BY c.id, c.post_id, c.user_id, c.comment, c.created_at
+    ORDER BY c.created_at DESC
+		`
+		// LIMIT句を追加する
 		if !allComments {
 			query += " LIMIT 3"
 		}
-		var comments []Comment
-		err = db.Select(&comments, query, p.ID)
+		var results []struct {
+			Count   int      `db:"count"`
+			ID      int      `db:"id"`          // IDフィールドを追加
+			PostID  int      `db:"post_id"`     // PostIDフィールドを追加
+			UserID  int      `db:"user_id"`     // UserIDフィールドを追加
+			Comment string   `db:"comment"`     // Commentフィールドを追加
+			CreatedAt time.Time `db:"created_at"` // CreatedAtフィールドを追加
+		}
+		err := db.Select(&results, query, p.ID)
 		if err != nil {
 			return nil, err
 		}
+		// 結果を分ける
+		if len(results) > 0 {
+			p.CommentCount = results[0].Count
+			comments = make([]Comment, len(results))
+			for i, result := range results {
+					comments[i] = Comment{
+							ID:        result.ID,
+							PostID:    result.PostID,
+							UserID:    result.UserID,
+							Comment:   result.Comment,
+							CreatedAt: result.CreatedAt,
+					}
+			}
+		}
+		// ------ ここまで ------
 
 
 		// ------ ここから ------
