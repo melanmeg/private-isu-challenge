@@ -104,6 +104,7 @@ matching_groups:
   - ^/image/[0-9]+$
   - ^/image/[0-9]+\..+$
   - ^/posts/[0-9]+$
+  - ^/posts.*
   - ^/@\w$
 ```
 
