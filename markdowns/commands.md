@@ -64,6 +64,8 @@ http://localhost:1080/
 ```bash
 go get github.com/go-delve/delve/cmd/dlv
 go get github.com/redis/go-redis/v8
+go get github.com/bradfitz/gomemcache/memcache
+go get github.com/bradleypeabody/gorilla-sessions-memcache
 go get github.com/kaz/pprotein
 ```
 
