@@ -33,6 +33,11 @@
 {"pass":true,"score":44437,"success":41681,"fail":0,"messages":[]}
 ```
 
+### ユーザー情報を一度に取得してN+1解消
+```bash
+{"pass":true,"score":95237,"success":91531,"fail":0,"messages":[]}
+```
+
 ### 画像ファイル取得時と同時にすべて書き出す。/image/* にマッチするリクエストを画像ファイルが存在する場合はそのファイルを返す（キャッシュも有効）
 ```bash
 {"pass":true,"score":88500,"success":84534,"fail":0,"messages":[]}
