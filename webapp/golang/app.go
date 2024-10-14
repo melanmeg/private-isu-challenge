@@ -193,14 +193,11 @@ func makePosts(results []Post, csrfToken string, allComments bool) ([]Post, erro
 	}
 
 	commentQuery := `SELECT COUNT(*) AS count,
-                          c.id,
                           c.post_id,
-                          c.user_id,
-                          c.comment,
                           c.created_at
                    FROM comments c
                    WHERE c.post_id IN (?)
-                   GROUP BY c.id, c.post_id, c.user_id, c.comment, c.created_at
+                   GROUP BY c.id, c.post_id
                    ORDER BY c.created_at DESC`
 	if !allComments {
 		commentQuery += " LIMIT 3" // LIMIT句は適切に調整する必要があります
