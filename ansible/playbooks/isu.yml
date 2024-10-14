@@ -1,0 +1,111 @@
+- name: all tools
+  hosts: all
+  gather_facts: false
+  user: "{{ ISUCON_USER }}"
+  become: true
+  max_fail_percentage: 0
+  vars_files:
+    - ../env.yml
+    - ../vars.yml
+  tasks:
+    - include_tasks: "../tasks/{{ item }}"
+      with_items: "{{ var.all.tools }}"
+      when: var.all.tools
+
+- name: all deploy
+  hosts: all
+  gather_facts: false
+  user: "{{ ISUCON_USER }}"
+  become: false
+  max_fail_percentage: 0
+  vars_files:
+    - ../env.yml
+    - ../vars.yml
+  tasks:
+    - include_tasks: "../tasks/{{ item }}"
+      with_items: "{{ var.all.isu }}"
+      when: var.all.isu
+
+- name: isu1 tools
+  hosts: isu1
+  gather_facts: false
+  user: "{{ ISUCON_USER }}"
+  become: true
+  max_fail_percentage: 0
+  vars_files:
+    - ../env.yml
+    - ../vars.yml
+  tasks:
+    - include_tasks: "../tasks/{{ item }}"
+      with_items: "{{ var.isu1.tools }}"
+      when: var.isu1.tools
+
+- name: isu1 deploy
+  hosts: isu1
+  gather_facts: false
+  user: "{{ ISUCON_USER }}"
+  become: false
+  max_fail_percentage: 0
+  vars_files:
+    - ../env.yml
+    - ../vars.yml
+  tasks:
+    - include_tasks: "../tasks/{{ item }}"
+      with_items: "{{ var.isu1.isu }}"
+      when: var.isu1.isu
+
+- name: isu2 tools
+  hosts: isu2
+  gather_facts: false
+  user: "{{ ISUCON_USER }}"
+  become: true
+  max_fail_percentage: 0
+  vars_files:
+    - ../env.yml
+    - ../vars.yml
+  tasks:
+    - include_tasks: "../tasks/{{ item }}"
+      with_items: "{{ var.isu2.tools }}"
+      when: var.isu2.tools
+
+- name: isu2 deploy
+  hosts: isu2
+  gather_facts: false
+  user: "{{ ISUCON_USER }}"
+  become: false
+  max_fail_percentage: 0
+  vars_files:
+    - ../env.yml
+    - ../vars.yml
+  tasks:
+    - include_tasks: "../tasks/{{ item }}"
+      with_items: "{{ var.isu2.isu }}"
+      when: var.isu2.isu
+
+- name: isu3 tools
+  hosts: isu3
+  gather_facts: false
+  user: "{{ ISUCON_USER }}"
+  become: true
+  max_fail_percentage: 0
+  vars_files:
+    - ../env.yml
+    - ../vars.yml
+  tasks:
+    - include_tasks: "../tasks/{{ item }}"
+      with_items: "{{ var.isu3.tools }}"
+      when: var.isu3.tools
+
+- name: isu3 deploy
+  hosts: isu3
+  gather_facts: false
+  user: "{{ ISUCON_USER }}"
+  become: false
+  max_fail_percentage: 0
+  vars_files:
+    - ../env.yml
+    - ../vars.yml
+  tasks:
+    - include_tasks: "../tasks/{{ item }}"
+      with_items: "{{ var.isu3.isu }}"
+      when: var.isu3.isu

@@ -2,7 +2,7 @@
 
 ### ansible local
 ```bash
-$ ansible-playbook --key-file ~/.ssh/main -i hosts ./playbooks/isu1.yml -C
+$ ansible-playbook --key-file ~/.ssh/main -i hosts ./playbooks/isu.yml -C
 ```
 
 ### shell

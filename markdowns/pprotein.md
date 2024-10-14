@@ -76,19 +76,19 @@ func main() {
     "Type": "pprof",
     "Label": "webapp",
     "URL": "http://192.168.11.22:6060/debug/pprof/profile",
-    "Duration": 10
+    "Duration": 60
   },
   {
     "Type": "httplog",
     "Label": "nginx",
     "URL": "http://192.168.11.22:19000/debug/log/httplog",
-    "Duration": 10
+    "Duration": 60
   },
   {
     "Type": "slowlog",
     "Label": "mysql",
     "URL": "http://192.168.11.22:19000/debug/log/slowlog",
-    "Duration": 10
+    "Duration": 60
   }
 ]
 ```

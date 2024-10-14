@@ -68,21 +68,22 @@
 {"pass":true,"score":161227,"success":155871,"fail":0,"messages":[]}
 ```
 
+- 次のタスク：ORDER BYはやっぱ必要そう(revertする)。そしてmemcachedにクエリキャッシュする
+- それ終われば、一旦サーバー分割してみたい
+
+
 ## 環境構築
 - https://gist.github.com/melanmeg/41e5f575b494ca83b7ca8ba76c91cd05
 
 - 初期設定
 ```bash
 # SSH後に実行
-$ cd ~
-
-$ git clone https://github.com/melanmeg/private-isu-challenge.git && \
+$ cd ~ && \
+  git clone https://github.com/melanmeg/private-isu-challenge.git && \
   mv private_isu private_isu.bk && \
-  mv private-isu-challenge private_isu
-
-$ ssh-keygen -t ed25519 -C "" -f ~/.ssh/id_ed25519 -N "" # デプロイキー
-
-$ sudo apt update -y
+  mv private-isu-challenge private_isu && \
+  ssh-keygen -t ed25519 -C "" -f ~/.ssh/id_ed25519 -N "" && \
+  sudo apt update -y
 ```
 
 - メモ
