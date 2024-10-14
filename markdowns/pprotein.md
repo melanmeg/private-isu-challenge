@@ -1,13 +1,5 @@
 # pprotein利用メモ
 
-1. ローカルにclone `git clone https://github.com/kaz/pprotein.git`
-2. ローカルでcompose up
-  - `network_mode: host` を追加
-3. SSHポートフォワーディング
-  - ssh -fN -L 19000:localhost:19000 isu1
-  - ssh -fN -L 6060:localhost:6060 isu1
-4. 以下手順実施
-
 - 依存ツールのインストール
 ```bash
 # Goパッケージインストール
@@ -83,19 +75,19 @@ func main() {
   {
     "Type": "pprof",
     "Label": "webapp",
-    "URL": "http://localhost:6060/debug/pprof/profile",
+    "URL": "http://192.168.11.22:6060/debug/pprof/profile",
     "Duration": 10
   },
   {
     "Type": "httplog",
     "Label": "nginx",
-    "URL": "http://localhost:19000/debug/log/httplog",
+    "URL": "http://192.168.11.22:19000/debug/log/httplog",
     "Duration": 10
   },
   {
     "Type": "slowlog",
     "Label": "mysql",
-    "URL": "http://localhost:19000/debug/log/slowlog",
+    "URL": "http://192.168.11.22:19000/debug/log/slowlog",
     "Duration": 10
   }
 ]
