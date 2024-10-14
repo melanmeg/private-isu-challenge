@@ -173,117 +173,112 @@ func getFlash(w http.ResponseWriter, r *http.Request, key string) string {
 	}
 }
 
-// unique は整数のスライスから重複を取り除く関数です
-func unique(intSlice []int) []int {
-	// マップを使って重複を取り除く
-	uniqueMap := make(map[int]struct{})
-	for _, item := range intSlice {
-			uniqueMap[item] = struct{}{}
-	}
-	// マップからユニークな整数をスライスに戻す
-	result := make([]int, 0, len(uniqueMap))
-	for key := range uniqueMap {
-			result = append(result, key)
-	}
-	return result
-}
-
 func makePosts(results []Post, csrfToken string, allComments bool) ([]Post, error) {
 	var posts []Post
 
+	// ポストIDのリストを作成
+	postIDs := make([]int, len(results))
+	for i, p := range results {
+		postIDs[i] = p.ID
+	}
+
+	// コメントを一度に取得
+	var comments []struct {
+		Count   int       `db:"count"`
+		ID      int       `db:"id"`
+		PostID  int       `db:"post_id"`
+		UserID  int       `db:"user_id"`
+		Comment string    `db:"comment"`
+		CreatedAt time.Time `db:"created_at"`
+	}
+
+	commentQuery := `SELECT COUNT(*) AS count,
+                          c.id,
+                          c.post_id,
+                          c.user_id,
+                          c.comment,
+                          c.created_at
+                   FROM comments c
+                   WHERE c.post_id IN (?)
+                   GROUP BY c.id, c.post_id, c.user_id, c.comment, c.created_at
+                   ORDER BY c.created_at DESC`
+	if !allComments {
+		commentQuery += " LIMIT 3" // LIMIT句は適切に調整する必要があります
+	}
+
+	commentQuery, args, err := sqlx.In(commentQuery, postIDs)
+	if err != nil {
+		return nil, err
+	}
+	commentQuery = db.Rebind(commentQuery)
+
+	err = db.Select(&comments, commentQuery, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	// コメントをポストにマッピング
+	commentMap := make(map[int][]Comment)
+	for _, c := range comments {
+		commentMap[c.PostID] = append(commentMap[c.PostID], Comment{
+			ID:        c.ID,
+			PostID:    c.PostID,
+			UserID:    c.UserID,
+			Comment:   c.Comment,
+			CreatedAt: c.CreatedAt,
+		})
+	}
+
+	// ユーザーIDのリストを作成
+	userIDs := make(map[int]struct{})
+	for _, commentList := range commentMap {
+		for _, comment := range commentList {
+			userIDs[comment.UserID] = struct{}{}
+		}
+	}
+
+	// 自分のポストのユーザーIDも追加
 	for _, p := range results {
-		// ------ ここから ------
-		// 【コメントを一度に取得を一度に取得してN+1解消】
-		var comments []Comment
-		// コメント数とコメントを一度に取得するクエリ
-		query := `
-    SELECT COUNT(*) AS count,
-           c.id,
-           c.post_id,
-           c.user_id,
-           c.comment,
-           c.created_at
-    FROM comments c
-    WHERE c.post_id = ?
-    GROUP BY c.id, c.post_id, c.user_id, c.comment, c.created_at
-    ORDER BY c.created_at DESC
-		`
-		// LIMIT句を追加する
-		if !allComments {
-			query += " LIMIT 3"
-		}
-		var results []struct {
-			Count   int      `db:"count"`
-			ID      int      `db:"id"`          // IDフィールドを追加
-			PostID  int      `db:"post_id"`     // PostIDフィールドを追加
-			UserID  int      `db:"user_id"`     // UserIDフィールドを追加
-			Comment string   `db:"comment"`     // Commentフィールドを追加
-			CreatedAt time.Time `db:"created_at"` // CreatedAtフィールドを追加
-		}
-		err := db.Select(&results, query, p.ID)
-		if err != nil {
-			return nil, err
-		}
-		// 結果を分ける
-		if len(results) > 0 {
-			p.CommentCount = results[0].Count
-			comments = make([]Comment, len(results))
-			for i, result := range results {
-					comments[i] = Comment{
-							ID:        result.ID,
-							PostID:    result.PostID,
-							UserID:    result.UserID,
-							Comment:   result.Comment,
-							CreatedAt: result.CreatedAt,
-					}
+		userIDs[p.UserID] = struct{}{}
+	}
+
+	// ユーザー情報を一度に取得
+	userIDList := make([]int, 0, len(userIDs))
+	for id := range userIDs {
+		userIDList = append(userIDList, id)
+	}
+
+	var users []User
+	userQuery, args, err := sqlx.In("SELECT * FROM `users` WHERE `id` IN (?)", userIDList)
+	if err != nil {
+		return nil, err
+	}
+	userQuery = db.Rebind(userQuery)
+
+	err = db.Select(&users, userQuery, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	// ユーザーIDをキーにしたマップを作成
+	userMap := make(map[int]User)
+	for _, user := range users {
+		userMap[user.ID] = user
+	}
+
+	// ポストを生成
+	for _, p := range results {
+		if comments, found := commentMap[p.ID]; found {
+			p.CommentCount = len(comments)
+			for i := range comments {
+				comments[i].User = userMap[comments[i].UserID]
 			}
+			p.Comments = comments
 		}
-		// ------ ここまで ------
 
-
-		// ------ ここから ------
-		// 【ユーザー情報を一度に取得してN+1解消】
-		// ユーザーIDのリストを作成
-		userIDs := make([]int, 0)
-		for _, comment := range comments {
-			userIDs = append(userIDs, comment.UserID)
-		}
-		userIDs = append(userIDs, p.UserID) // p.UserID も含める
-		// 重複するユーザーIDを削除
-		userIDs = unique(userIDs)
-		// ユーザー情報を一度に取得
-		var users []User
-		query, args, err := sqlx.In("SELECT * FROM `users` WHERE `id` IN (?)", userIDs)
-		if err != nil {
-			return nil, err
-		}
-		query = db.Rebind(query)
-		err = db.Select(&users, query, args...)
-		if err != nil {
-			return nil, err
-		}
-		// ユーザーIDをキーにしたマップを作成
-		userMap := make(map[int]User)
-		for _, user := range users {
-			userMap[user.ID] = user
-		}
-		// コメントに対応するユーザーをマップから取得
-		for i := 0; i < len(comments); i++ {
-			comments[i].User = userMap[comments[i].UserID]
-		}
-		// reverse
-		for i, j := 0, len(comments)-1; i < j; i, j = i+1, j-1 {
-			comments[i], comments[j] = comments[j], comments[i]
-		}
-		p.Comments = comments
-		// p のユーザーをマップから取得
 		p.User = userMap[p.UserID]
-		// ------ ここまで ------
-
-
 		p.CSRFToken = csrfToken
 
-		// p.User.DelFlg == 0 の行だけ結果に追加
 		if p.User.DelFlg == 0 {
 			posts = append(posts, p)
 		}
