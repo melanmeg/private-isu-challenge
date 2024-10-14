@@ -2,6 +2,7 @@ package main
 
 import (
 	crand "crypto/rand"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
@@ -29,6 +30,7 @@ import (
 var (
 	db    *sqlx.DB
 	store *gsm.MemcacheStore
+	memc  *memcache.Client // Memcachedクライアントを追加
 )
 
 const (
@@ -76,6 +78,7 @@ func init() {
 	}
 	memcacheClient := memcache.New(memdAddr)
 	store = gsm.NewMemcacheStore(memcacheClient, "iscogram_", []byte("sendagaya"))
+	memc = memcacheClient // memcにMemcachedクライアントをセット
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 }
 
@@ -183,7 +186,21 @@ func makePosts(results []Post, csrfToken string, allComments bool) ([]Post, erro
 		postIDs[i] = p.ID
 	}
 
-	// コメントを一度に取得
+	// Memcachedキーの生成
+	cacheKey := fmt.Sprintf("posts:%v:%v", postIDs, allComments)
+
+	// Memcachedからキャッシュを取得
+	item, err := memc.Get(cacheKey) // ここをmemc.Getに変更
+	if err == nil {
+		// キャッシュがヒットした場合、JSONをデコードして返す
+		err := json.Unmarshal(item.Value, &posts)
+		if err != nil {
+			return nil, err
+		}
+		return posts, nil
+	}
+
+	// キャッシュが存在しない場合の処理
 	var comments []struct {
 		Count    int       `db:"count"`
 		PostID   int       `db:"post_id"`
@@ -193,8 +210,7 @@ func makePosts(results []Post, csrfToken string, allComments bool) ([]Post, erro
 	commentQuery := `SELECT c.post_id, COUNT(*) AS count, MAX(c.created_at) AS created_at
                      FROM comments c
                      WHERE c.post_id IN (?)
-                     GROUP BY c.post_id
-                  `
+                     GROUP BY c.post_id`
 	if !allComments {
 		commentQuery += " LIMIT 3" // LIMIT句は適切に調整する必要があります
 	}
@@ -214,8 +230,8 @@ func makePosts(results []Post, csrfToken string, allComments bool) ([]Post, erro
 	commentMap := make(map[int][]Comment)
 	for _, c := range comments {
 		commentMap[c.PostID] = append(commentMap[c.PostID], Comment{
-			PostID:   c.PostID,
-			Count:    c.Count,
+			PostID:    c.PostID,
+			Count:     c.Count,
 			CreatedAt: c.CreatedAt,
 		})
 	}
@@ -276,6 +292,20 @@ func makePosts(results []Post, csrfToken string, allComments bool) ([]Post, erro
 		if len(posts) >= postsPerPage {
 			break
 		}
+	}
+
+	// 取得したポストをキャッシュに保存
+	value, err := json.Marshal(posts)
+	if err != nil {
+		return nil, err
+	}
+	err = memc.Set(&memcache.Item{ // ここをmemc.Setに変更
+		Key:        cacheKey,
+		Value:      value,
+		Expiration: int32(time.Minute * 10 / time.Second), // キャッシュの有効期限を設定
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	return posts, nil
