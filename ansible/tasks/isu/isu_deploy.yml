@@ -1,3 +1,7 @@
+- name: set git pull rebase
+  shell: git config --global pull.rebase true
+  ignore_errors: true
+
 - name: isu-ruby is disabled
   become: yes
   systemd:
