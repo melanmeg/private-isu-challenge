@@ -1,51 +1,13 @@
 # pprotein利用メモ
 
-- 依存ツールのインストール
-```bash
-# Goパッケージインストール
-go get github.com/kaz/pprotein
+### phpmyadmin, pproteinを外部インスタンスで用意したい
 
-# pprofのグラフ描画に使うgraphviz
-sudo apt install -y graphviz gv
+### 参考：
+  - [pprotein でボトルネックを探して ISUCON で優勝する](https://zenn.dev/team_soda/articles/20231206000000)
+  - [ISUCON12で優勝しました(チーム NaruseJun)](https://zenn.dev/tohutohu/articles/8c34d1187e1b21)
 
-# スロークエリログの分析に使うslp
-wget https://github.com/tkuchiki/slp/releases/download/v0.2.0/slp_linux_amd64.tar.gz
-tar -xvf slp_linux_amd64.tar.gz
-sudo mv slp /usr/local/bin/slp
-
-# アクセスログの分析に使うalp
-wget https://github.com/tkuchiki/alp/releases/download/v1.0.21/alp_linux_amd64.tar.gz
-tar -xvf alp_linux_amd64.tar.gz
-sudo mv alp /usr/local/bin/alp
-
-# pprotein本体
-wget https://github.com/kaz/pprotein/releases/download/v1.2.3/pprotein_1.2.3_linux_amd64.tar.gz
-tar -xvf pprotein_1.2.3_linux_amd64.tar.gz
-mv pprotein-agent /home/isucon/pprotein-agent
-```
-
-- pprotein-agentのserviceを起動 `sudo vim /etc/systemd/system/pprotein-agent.service`
-```
-[Unit]
-Description=pprotein-agent service
-
-[Service]
-ExecStart=/home/isucon/pprotein-agent
-WorkingDirectory=/home/isucon
-Environment=PATH=$PATH:/usr/local/bin
-Restart=always
-User=root
-
-[Install]
-WantedBy=multi-user.target
-```
-
-- サービス起動
-```bash
-sudo systemctl start pprotein-agent
-```
-
-- Goにコードを仕込む（echov4の場合）
+### Goにコードを仕込む
+- echov4の場合
 > その他に、echo, git, mux, standalone なども統合可能。
 > ref: https://github.com/kaz/pprotein/tree/master/integration
 ```golang
@@ -58,7 +20,7 @@ func main() {
 }
 ```
 
-- Goにコードを仕込む（standaloneの場合）
+- standaloneの場合
 ```golang
 import (
   "github.com/kaz/pprotein/integration/standalone"
@@ -69,7 +31,7 @@ func main() {
 }
 ```
 
-- group/targets の設定
+### pprotein の group/targets の設定
 ```json
 [
   {
@@ -93,7 +55,7 @@ func main() {
 ]
 ```
 
-- httplog/config の設定
+### pprotein の httplog/config の設定
 ```
 sort: sum # max|min|avg|sum|count|uri|method|max-body|min-body|avg-body|sum-body|p1|p50|p99|stddev
 reverse: true
@@ -108,5 +70,5 @@ matching_groups:
   - ^/@\w$
 ```
 
-- slowlog/config の設定
-  - 未定
+### pprotein の slowlog/config の設定
+  - デフォルトで

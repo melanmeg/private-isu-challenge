@@ -1,3 +1,5 @@
+# https://repo.netdata.cloud/repos/stable/ubuntu/noble/netdata_1.47.4%2Bubuntu24.04_amd64.deb
+
 - name: Install the package
   apt:
     name:
@@ -32,4 +34,3 @@
     name: netdata
     state: restarted
   ignore_errors: true
-# https://repo.netdata.cloud/repos/stable/ubuntu/noble/netdata_1.47.4%2Bubuntu24.04_amd64.deb

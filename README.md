@@ -53,7 +53,7 @@
 {"pass":true,"score":162687,"success":156868,"fail":0,"messages":[]}
 ```
 
-### たぶん不要だったカラム削除
+### たぶん不要だったGROUP BYカラム削除
 ```bash
 {"pass":true,"score":161000,"success":155095,"fail":0,"messages":[]}
 ```
@@ -68,10 +68,6 @@
 {"pass":true,"score":161227,"success":155871,"fail":0,"messages":[]}
 ```
 
-- 次のタスク：ORDER BYはやっぱ必要そう(revertする)。そしてmemcachedにクエリキャッシュする
-- それ終われば、一旦サーバー分割してみたい
-
-
 ## 環境構築
 - https://gist.github.com/melanmeg/41e5f575b494ca83b7ca8ba76c91cd05
 
@@ -85,30 +81,6 @@ $ cd ~ && \
   ssh-keygen -t ed25519 -C "" -f ~/.ssh/id_ed25519 -N "" && \
   sudo apt update -y
 ```
-
-- メモ
-```bash
-$ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index post_id_index (post_id, created_at DESC);"
-
-EXPLAIN SELECT `id`, `user_id`, `body`, `mime`, `created_at` FROM `posts` ORDER BY `created_at` DESC;
-$ mysql -u isuconp -pisuconp isuconp -e "alter table posts add index posts_order_idx (created_at DESC);"
-$ mysql -u isuconp -pisuconp isuconp -e "alter table posts add index posts_user_idx (user_id, created_at DESC);"
-
-$ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index idx_user_id (user_id);"
-
-EXPLAIN SELECT COUNT(*) AS count,
-      c.post_id,
-      c.created_at
-FROM comments c
-WHERE c.post_id IN (1,2,3)
-GROUP BY c.id, c.post_id
-ORDER BY c.created_at DESC;
-
-$ mysql -u isuconp -pisuconp isuconp -e "alter table `comments` add index `idx_user_id` (`user_id`);"
-
-
-```
-
 
 ## 参考
 - [kazeburo/private-isu-challenge](https://github.com/kazeburo/private-isu-challenge)

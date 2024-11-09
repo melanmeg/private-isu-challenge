@@ -13,13 +13,6 @@ ISUCON_DB_NAME:=isuconp
 ISUCON_DB_USER:=isuconp
 ISUCON_DB_PASSWORD:=isuconp
 
-NGINX_LOG:=/var/log/nginx/access.log
-DB_SLOW_LOG:=/var/log/mysql/mysql-slow.log
-
-# http://localhost:19999/netdata.confのdirectories.webで確認可能
-NETDATA_WEBROOT_PATH:=/var/lib/netdata/www
-NETDATA_CUSTUM_HTML:=tool-config/netdata/*
-
 # メインで使うコマンド ------------------------
 
 # ベンチマーク前に実施
@@ -36,58 +29,12 @@ deploy:
 	sudo rm -f $(DB_SLOW_LOG)
 	sudo systemctl restart mysql
 
-
-# alpでアクセスログを確認する
-.PHONY: alp
-alp:
-	sudo cat $(NGINX_LOG) \
-	| alp ltsv -m '/image/[0-9]+,/posts/[0-9]+,/@\w' \
-	--sort avg -r -o count,1xx,2xx,3xx,4xx,5xx,min,max,avg,sum,p99,method,uri
-
-.PHONY: alp2
-alp2:
-	sudo alp ltsv --file=$(NGINX_LOG) --config=alp-config.yml
-
-
-# slow queryを確認する
-.PHONY: slow-query
-slow-query:
-	# sudo sed -i '/^INSERT INTO `posts`/d' $(DB_SLOW_LOG)
-	sudo pt-query-digest $(DB_SLOW_LOG)
-
-.PHONY: slow-query2
-slow-query2:
-	sudo pt-query-digest --filter 'length($$event->{arg}) <= 2000' $(DB_SLOW_LOG)
-
-
-# pprofで記録する
-.PHONY: pprof
-pprof:
-	curl -o pprof/cpu_$$(date +"%Y-%m-%d-%H-%M-%S").pprof http://localhost:6060/debug/pprof/profile?seconds=60
-
-.PHONY: fgprof
-fgprof:
-	curl -o pprof/cpu_$$(date +"%Y-%m-%d-%H-%M-%S").pprof http://localhost:6060/debug/fgprof?seconds=6
-
-# pprofで確認する
-.PHONY: pprof-check
-pprof-check:
-	$(eval latest := $(shell ls -rt pprof/ | tail -n 1))
-	go tool pprof -http localhost:1080 /pprof/$(latest)
-
-.PHONY: fgprof-check
-fgprof-check:
-	$(eval latest := $(shell ls -rt pprof/ | tail -n 1))
-	go tool pprof -http localhost:1080 pprof/$(latest)
-
-
 # DBに接続する
 .PHONY: mysql
 mysql:
 	mysql -h $(ISUCON_DB_HOST) -P $(ISUCON_DB_PORT) -u $(ISUCON_DB_USER) -p$(ISUCON_DB_PASSWORD) $(ISUCON_DB_NAME)
 
-
-# Git設定する
+# Gitの初期設定
 .PHONY: git-setup
 git-setup:
 	# git用の設定は適宜変更して良い
@@ -97,8 +44,7 @@ git-setup:
 	# deploykeyの作成
 	ssh-keygen -t ed25519 -C "" -f ~/.ssh/id_ed25519 -N ""
 
-
-# private-isuでGOROOT空だったので、そのような場合に実行
+# private-isuでGOROOT空だったので、そのような場合にGoをインストールする
 .PHONY: go-reinstall
 go-reinstall:
 	sudo rm -rf /usr/local/go

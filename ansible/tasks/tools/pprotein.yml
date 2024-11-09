@@ -1,0 +1,91 @@
+# ----- slp -----
+- name: Download
+  get_url:
+    url: https://github.com/tkuchiki/slp/releases/download/v0.2.0/slp_linux_amd64.tar.gz
+    dest: /tmp/
+
+- name: Unarchive
+  unarchive:
+    src: /tmp/slp_linux_amd64.tar.gz
+    dest: /tmp/
+    remote_src: true
+  ignore_errors: true
+
+- name: install
+  shell: sudo install /tmp/slp /usr/local/bin
+
+- name: remove file
+  file:
+    path: /tmp/slp
+    state: absent
+
+- name: remove file
+  file:
+    path: /tmp/slp_linux_amd64.tar.gz
+    state: absent
+
+# ----- alp -----
+- name: Download
+  get_url:
+    url: https://github.com/tkuchiki/alp/releases/download/v1.0.21/alp_linux_amd64.tar.gz
+    dest: /tmp/
+
+- name: Unarchive
+  unarchive:
+    src: /tmp/alp_linux_amd64.tar.gz
+    dest: /tmp/
+    remote_src: true
+  ignore_errors: true
+
+- name: install
+  shell: sudo install /tmp/alp /usr/local/bin
+
+- name: remove file
+  file:
+    path: /tmp/alp
+    state: absent
+
+- name: remove file
+  file:
+    path: /tmp/alp_linux_amd64.tar.gz
+    state: absent
+
+# ----- pprotein-agent -----
+- name: Download
+  get_url:
+    url: https://github.com/kaz/pprotein/releases/download/v1.2.3/pprotein_1.2.3_linux_amd64.tar.gz
+    dest: /tmp/
+
+- name: Unarchive
+  unarchive:
+    src: /tmp/pprotein_1.2.3_linux_amd64.tar.gz
+    dest: /tmp/
+    remote_src: true
+  ignore_errors: true
+
+- name: install
+  shell: sudo install /tmp/pprotein-agent /home/isucon
+
+- name: remove file
+  file:
+    path: /tmp/slp
+    state: absent
+
+- name: remove file
+  file:
+    path: /tmp/pprotein_1.2.3_linux_amd64.tar.gz
+    state: absent
+
+- name: Copy service
+  become: true
+  ansible.builtin.copy:
+    src: ../../files/services/pprotein-agent.service
+    dest: /etc/systemd/system/pprotein-agent.service
+    mode: "0644"
+
+- name: pprotein-agent is running
+  systemd:
+    name: pprotein-agent
+    state: restarted
+    enabled: true
+  ignore_errors: true

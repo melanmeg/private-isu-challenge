@@ -26,12 +26,7 @@
 - name: setup
   shell: make
   args:
-    chdir: "{{ ISUCON_DIR }}/webapp/golang/"
-
-- name: setup
-  shell: make init
-  args:
-    chdir: "{{ ISUCON_DIR }}/webapp/golang/"
+    chdir: "{{ BUILD_DIR }}"
 
 - name: "{{ SERVICE_NAME }} is restarted"
   become: yes
