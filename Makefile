@@ -7,7 +7,7 @@ GIT_DIR:=/home/isucon/private_isu
 BUILD_DIR:=$(GIT_DIR)/webapp/golang
 SERVICE_NAME:=isu-go.service
 
-ISUCON_DB_HOST:=127.0.0.1
+ISUCON_DB_HOST:=127.0.0.1  # localhostだとbindしないので注意
 ISUCON_DB_PORT:=3306
 ISUCON_DB_NAME:=isuconp
 ISUCON_DB_USER:=isuconp

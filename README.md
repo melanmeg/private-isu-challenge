@@ -71,6 +71,9 @@
 ## 環境構築
 - https://gist.github.com/melanmeg/41e5f575b494ca83b7ca8ba76c91cd05
 
+> pproteinとphpmyadminの用意
+- https://gist.github.com/melanmeg/d90533425d32b87f16b695667b8de141
+
 - 初期設定
 ```bash
 # SSH後に実行
