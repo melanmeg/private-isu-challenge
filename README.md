@@ -41,21 +41,32 @@ $ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index idx_post
 ![httplog](./images/4_2.PNG)
 ![httplog](./images/4_3.PNG)
 
-### postsテーブル idx_created_at_desc
-```bash
-$ mysql -u isuconp -pisuconp isuconp -e "alter table posts add index idx_created_at_desc (created_at DESC);"
-```
-```bash
-{"pass":true,"score":54217,"success":51773,"fail":0,"messages":[]}
-```
-
 ### posts, usersをjoin. LIMIT 20
+- https://github.com/melanmeg/private-isu-challenge/commit/bc1662d5c64f324286c2258b1dd07fa670041a9b
 ```bash
 ```
 
 ### commentsテーブル idx_user_id 追加
 ```bash
 $ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index idx_user_id (user_id);"
+```
+```bash
+```
+
+### postsテーブル idx_created_at_desc 追加. force indexを追加.
+```bash
+# メモ) ここで以下のようなクエリが上位にくるはず
+SELECT p.id, p.user_id, p.body, p.mime, p.created_at, u.account_name
+FROM posts AS p
+JOIN users AS u
+ON (p.user_id = u.id)
+WHERE p.user_id ='85'
+AND u.del_flg = 0
+ORDER BY p.created_at
+DESC LIMIT 20
+```
+```bash
+$ mysql -u isuconp -pisuconp isuconp -e "alter table posts add index idx_created_at_desc (created_at DESC);"
 ```
 ```bash
 ```
