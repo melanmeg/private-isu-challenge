@@ -13,6 +13,9 @@ ISUCON_DB_NAME:=isuconp
 ISUCON_DB_USER:=isuconp
 ISUCON_DB_PASSWORD:=isuconp
 
+NGINX_LOG:=/var/log/nginx/access.log
+DB_SLOW_LOG:=/var/log/mysql/mysql-slow.log
+
 # メインで使うコマンド ------------------------
 
 # ベンチマーク前に実施

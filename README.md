@@ -35,13 +35,18 @@ $ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index idx_post
 - https://github.com/melanmeg/private-isu-challenge/commit/9665894c45f6c09bdfaf2efbc1dd09de8acbf144
 - https://github.com/melanmeg/private-isu-challenge/commit/d7053047c2a1fac6ab9f1d6888ee28125f2eca4e
 ```bash
+{"pass":true,"score":54217,"success":51773,"fail":0,"messages":[]}
 ```
+![httplog](./images/4.PNG)
+![httplog](./images/4_2.PNG)
+![httplog](./images/4_3.PNG)
 
 ### postsテーブル idx_created_at_desc
 ```bash
 $ mysql -u isuconp -pisuconp isuconp -e "alter table posts add index idx_created_at_desc (created_at DESC);"
 ```
 ```bash
+{"pass":true,"score":54217,"success":51773,"fail":0,"messages":[]}
 ```
 
 ### posts, usersをjoin. LIMIT 20
