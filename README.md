@@ -8,14 +8,16 @@
 ```bash
 {"pass":true,"score":4193,"success":4037,"fail":0,"messages":[]}
 ```
-![slowQuery](./images/1.PNG)
+![slowlog](./images/1.PNG)
 
 ### commentsテーブル idx_post_id_created_at_desc 追加
 ```bash
 $ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index idx_post_id_created_at_desc (post_id, created_at DESC);"
 ```
 ```bash
+{"pass":true,"score":34720,"success":32646,"fail":0,"messages":[]}
 ```
+![httplog](./images/1.PNG)
 
 ### 静的ファイルをキャッシュ
 - https://github.com/melanmeg/private-isu-challenge/commit/9f8feaf67195e1fc3e1eb40347beea714852fab4
