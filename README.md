@@ -72,12 +72,6 @@ $ curl -fsSL "$URL" -o /tmp/go.tar.gz && \
 $ cat <<EOF >> ~/.bashrc
 export GOROOT=/usr/local/go
 export GOPATH=$HOME/go
-if [[ ":$PATH:" != *":$GOROOT/bin:"* ]]; then
-  export PATH=$GOROOT/bin:$PATH # head is higher priority
-fi
-if [[ ":$PATH:" != *":$GOPATH/bin:"* ]]; then
-  export PATH=$GOPATH/bin:$PATH # head is higher priority
-fi
 EOF
 ```
 

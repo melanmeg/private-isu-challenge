@@ -72,3 +72,5 @@ matching_groups:
 
 ### pprotein の slowlog/config の設定
   - デフォルトで
+
+slpとは: https://github.com/tkuchiki/slp/blob/main/README.ja.md

@@ -22,6 +22,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/sessions"
 	"github.com/jmoiron/sqlx"
+	"github.com/kaz/pprotein/integration/standalone"
 )
 
 var (
@@ -849,6 +850,12 @@ func main() {
 	r.Get("/*", func(w http.ResponseWriter, r *http.Request) {
 		http.FileServer(http.Dir("../public")).ServeHTTP(w, r)
 	})
+
+	// pproteinデバッグサーバーを起動
+	go func() {
+		log.Println("Starting pprotein debug server on :6060")
+		standalone.Integrate(":6060")
+	}()
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
