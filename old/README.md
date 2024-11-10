@@ -1,50 +1,72 @@
 # private-isu-challenge
 
----
-
 ## スコア推移
 
 ### 初期スコア
+
 ```bash
+{"pass":true,"score":4366,"success":4205,"fail":0,"messages":[]}
 ```
 
-### commentsテーブル idx_post_id_created_at_desc 追加
+### commentsテーブル post_id_index(変更>idx_post_id_created_at_desc) 追加
 ```bash
-$ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index idx_post_id_created_at_desc (post_id, created_at DESC);"
-```
-```bash
+{"pass":true,"score":34655,"success":32526,"fail":0,"messages":[]}
 ```
 
 ### 静的ファイルをキャッシュ
-- https://github.com/melanmeg/private-isu-challenge/commit/9f8feaf67195e1fc3e1eb40347beea714852fab4
 ```bash
+{"pass":true,"score":35412,"success":33324,"fail":0,"messages":[]}
 ```
 
-### postsテーブル idx_created_at_desc
+### postsテーブル posts_order_idx(変更>idx_created_at_desc), posts_user_idx 追加
 ```bash
-$ mysql -u isuconp -pisuconp isuconp -e "alter table posts add index idx_created_at_desc (created_at DESC);"
-```
-```bash
+{"pass":true,"score":36243,"success":34161,"fail":0,"messages":[]}
 ```
 
-### posts, usersをjoin. LIMIT 20
+### LIMIT 20
 ```bash
+{"pass":true,"score":43344,"success":41806,"fail":133,"messages":["1ページに表示される画像の数が足りません (GET /)"]}
+```
+
+### posts, usersをjoin。posts_user_idx削除
+```bash
+{"pass":true,"score":44437,"success":41681,"fail":0,"messages":[]}
+```
+
+### ユーザー情報を一度に取得してN+1解消
+```bash
+{"pass":true,"score":95237,"success":91531,"fail":0,"messages":[]}
 ```
 
 ### 画像ファイル取得時と同時にすべて書き出す。/image/* にマッチするリクエストを画像ファイルが存在する場合はそのファイルを返す（キャッシュも有効）
-- https://github.com/melanmeg/private-isu-challenge/commit/9665894c45f6c09bdfaf2efbc1dd09de8acbf144
-- https://github.com/melanmeg/private-isu-challenge/commit/d7053047c2a1fac6ab9f1d6888ee28125f2eca4e
 ```bash
+{"pass":true,"score":88500,"success":84534,"fail":0,"messages":[]}
+```
+
+### コメントを一度に取得を一度に取得してN+1解消
+```bash
+{"pass":true,"score":103296,"success":99339,"fail":0,"messages":[]}
+```
+
+### 1.コメントとユーザー情報をバッチで取得。2.データ構造のマッピング。3.コードの読みやすさと保守性を向上。by ChatGPT
+```bash
+{"pass":true,"score":162687,"success":156868,"fail":0,"messages":[]}
+```
+
+### たぶん不要だったGROUP BYカラム削除
+```bash
+{"pass":true,"score":161000,"success":155095,"fail":0,"messages":[]}
 ```
 
 ### commentsテーブル idx_user_id 追加
 ```bash
-$ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index idx_user_id (user_id);"
-```
-```bash
+{"pass":true,"score":169587,"success":163265,"fail":0,"messages":[]}
 ```
 
----
+### 不要なカラム削減、ORDER BYなくても良さそうだった。（なぜかスコアさがる...）
+```bash
+{"pass":true,"score":161227,"success":155871,"fail":0,"messages":[]}
+```
 
 ## 環境構築
 - https://gist.github.com/melanmeg/41e5f575b494ca83b7ca8ba76c91cd05
@@ -62,8 +84,6 @@ $ cd ~ && \
   ssh-keygen -t ed25519 -C "" -f ~/.ssh/id_ed25519 -N "" && \
   sudo apt update -y
 ```
-
----
 
 ## 参考
 - [kazeburo/private-isu-challenge](https://github.com/kazeburo/private-isu-challenge)

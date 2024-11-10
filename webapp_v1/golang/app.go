@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -22,6 +23,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/sessions"
 	"github.com/jmoiron/sqlx"
+	"github.com/kaz/pprotein/integration/standalone"
 )
 
 var (
@@ -64,6 +66,7 @@ type Comment struct {
 	Comment   string    `db:"comment"`
 	CreatedAt time.Time `db:"created_at"`
 	User      User
+	Count     int
 }
 
 func init() {
@@ -174,41 +177,97 @@ func getFlash(w http.ResponseWriter, r *http.Request, key string) string {
 func makePosts(results []Post, csrfToken string, allComments bool) ([]Post, error) {
 	var posts []Post
 
+	// ポストIDのリストを作成
+	postIDs := make([]int, len(results))
+	for i, p := range results {
+		postIDs[i] = p.ID
+	}
+
+	// コメントを一度に取得
+	var comments []struct {
+		Count    int       `db:"count"`
+		PostID   int       `db:"post_id"`
+		CreatedAt time.Time `db:"created_at"`
+	}
+
+	commentQuery := `SELECT c.post_id, COUNT(*) AS count, MAX(c.created_at) AS created_at
+                     FROM comments c
+                     WHERE c.post_id IN (?)
+                     GROUP BY c.post_id
+                  `
+	if !allComments {
+		commentQuery += " LIMIT 3" // LIMIT句は適切に調整する必要があります
+	}
+
+	commentQuery, args, err := sqlx.In(commentQuery, postIDs)
+	if err != nil {
+		return nil, err
+	}
+	commentQuery = db.Rebind(commentQuery)
+
+	err = db.Select(&comments, commentQuery, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	// コメントをポストにマッピング
+	commentMap := make(map[int][]Comment)
+	for _, c := range comments {
+		commentMap[c.PostID] = append(commentMap[c.PostID], Comment{
+			PostID:   c.PostID,
+			Count:    c.Count,
+			CreatedAt: c.CreatedAt,
+		})
+	}
+
+	// ユーザーIDのリストを作成
+	userIDs := make(map[int]struct{})
+	for _, commentList := range commentMap {
+		for _, comment := range commentList {
+			userIDs[comment.UserID] = struct{}{}
+		}
+	}
+
+	// 自分のポストのユーザーIDも追加
 	for _, p := range results {
-		err := db.Get(&p.CommentCount, "SELECT COUNT(*) AS `count` FROM `comments` WHERE `post_id` = ?", p.ID)
-		if err != nil {
-			return nil, err
-		}
+		userIDs[p.UserID] = struct{}{}
+	}
 
-		query := "SELECT * FROM `comments` WHERE `post_id` = ? ORDER BY `created_at` DESC"
-		if !allComments {
-			query += " LIMIT 3"
-		}
-		var comments []Comment
-		err = db.Select(&comments, query, p.ID)
-		if err != nil {
-			return nil, err
-		}
+	// ユーザー情報を一度に取得
+	userIDList := make([]int, 0, len(userIDs))
+	for id := range userIDs {
+		userIDList = append(userIDList, id)
+	}
 
-		for i := 0; i < len(comments); i++ {
-			err := db.Get(&comments[i].User, "SELECT * FROM `users` WHERE `id` = ?", comments[i].UserID)
-			if err != nil {
-				return nil, err
+	var users []User
+	userQuery, args, err := sqlx.In("SELECT * FROM `users` WHERE `id` IN (?)", userIDList)
+	if err != nil {
+		return nil, err
+	}
+	userQuery = db.Rebind(userQuery)
+
+	err = db.Select(&users, userQuery, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	// ユーザーIDをキーにしたマップを作成
+	userMap := make(map[int]User)
+	for _, user := range users {
+		userMap[user.ID] = user
+	}
+
+	// ポストを生成
+	for _, p := range results {
+		if comments, found := commentMap[p.ID]; found {
+			p.CommentCount = len(comments)
+			for i := range comments {
+				comments[i].User = userMap[comments[i].UserID]
 			}
+			p.Comments = comments
 		}
 
-		// reverse
-		for i, j := 0, len(comments)-1; i < j; i, j = i+1, j-1 {
-			comments[i], comments[j] = comments[j], comments[i]
-		}
-
-		p.Comments = comments
-
-		err = db.Get(&p.User, "SELECT * FROM `users` WHERE `id` = ?", p.UserID)
-		if err != nil {
-			return nil, err
-		}
-
+		p.User = userMap[p.UserID]
 		p.CSRFToken = csrfToken
 
 		if p.User.DelFlg == 0 {
@@ -386,7 +445,14 @@ func getIndex(w http.ResponseWriter, r *http.Request) {
 
 	results := []Post{}
 
-	err := db.Select(&results, "SELECT `id`, `user_id`, `body`, `mime`, `created_at` FROM `posts` ORDER BY `created_at` DESC")
+	err := db.Select(&results, `
+		SELECT p.id, p.user_id, p.body, p.mime, p.created_at
+		FROM posts AS p
+		JOIN users AS u ON (p.user_id = u.id)
+		WHERE u.del_flg = 0
+		ORDER BY p.created_at DESC
+		LIMIT 20
+	`)
 	if err != nil {
 		log.Print(err)
 		return
@@ -670,6 +736,42 @@ func postIndex(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/posts/"+strconv.FormatInt(pid, 10), http.StatusFound)
 }
 
+func writeImageToFile(post Post) error {
+	// ディレクトリパスを指定
+	dirPath := "../public/images"
+
+	// ディレクトリが存在しない場合は作成
+	if err := os.MkdirAll(dirPath, os.ModePerm); err != nil {
+		return fmt.Errorf("failed to create directory: %v", err)
+	}
+
+	// MIMEタイプに基づいてファイル拡張子を決定
+	var ext string
+	switch post.Mime {
+	case "image/jpeg":
+		ext = ".jpg"
+	case "image/png":
+		ext = ".png"
+	default:
+		return fmt.Errorf("unsupported mime type: %s", post.Mime)
+	}
+
+	// ファイル名をpost IDに基づいて作成
+	fileName := fmt.Sprintf("%d%s", post.ID, ext)
+
+	// 完全なファイルパスを生成
+	filePath := filepath.Join(dirPath, fileName)
+
+	// ファイルにバイナリデータを書き出す
+	err := os.WriteFile(filePath, post.Imgdata, 0644)
+	if err != nil {
+		return fmt.Errorf("failed to write image to file: %v", err)
+	}
+
+	fmt.Printf("Image successfully written to %s\n", filePath)
+	return nil
+}
+
 func getImage(w http.ResponseWriter, r *http.Request) {
 	pidStr := r.PathValue("id")
 	pid, err := strconv.Atoi(pidStr)
@@ -680,6 +782,9 @@ func getImage(w http.ResponseWriter, r *http.Request) {
 
 	post := Post{}
 	err = db.Get(&post, "SELECT * FROM `posts` WHERE `id` = ?", pid)
+	// 取得と同時に画像ファイルは書き出しする
+	writeImageToFile(post)
+
 	if err != nil {
 		log.Print(err)
 		return
@@ -791,6 +896,7 @@ func postAdminBanned(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/admin/banned", http.StatusFound)
 }
 
+// main関数
 func main() {
 	host := os.Getenv("ISUCONP_DB_HOST")
 	if host == "" {
@@ -850,5 +956,12 @@ func main() {
 		http.FileServer(http.Dir("../public")).ServeHTTP(w, r)
 	})
 
+	// pproteinデバッグサーバーを起動
+	go func() {
+		log.Println("Starting pprotein debug server on :6060")
+		standalone.Integrate(":6060")
+	}()
+
+	// メインのHTTPサーバーを起動
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
