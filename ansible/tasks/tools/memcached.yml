@@ -1,0 +1,18 @@
+- name: Install the package
+  become: true
+  apt:
+    name:
+      - memcached
+
+- name: Copy
+  become: true
+  copy:
+    src: ../../files/memcached/memcached.conf
+    dest: /etc/memcached.conf
+    mode: "0644"
+
+- name: memcached is restarted
+  become: true
+  systemd:
+    name: memcached
+    state: restarted

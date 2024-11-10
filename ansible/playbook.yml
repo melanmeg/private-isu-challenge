@@ -12,6 +12,7 @@
     - include_tasks: tasks/tools/common.yml
     - include_tasks: tasks/tools/nginx.yml
     - include_tasks: tasks/tools/mysql.yml
+    - include_tasks: tasks/tools/memcached.yml
     - include_tasks: tasks/tools/netdata.yml
     - include_tasks: tasks/tools/pprotein.yml
     - include_tasks: tasks/tools/sysctl.yml
