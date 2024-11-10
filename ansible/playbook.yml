@@ -20,7 +20,7 @@
   hosts: isu1
   gather_facts: false
   user: "{{ ISUCON_USER }}"
-  become: true
+  become: false
   max_fail_percentage: 0
   vars_files:
     - env.yml
@@ -33,13 +33,12 @@
 #   hosts: isu2
 #   gather_facts: false
 #   user: "{{ ISUCON_USER }}"
-#   become: true
+#   become: false
 #   max_fail_percentage: 0
 #   vars_files:
 #     - env.yml
 #   tasks:
-#     - include_tasks: tasks/isu/isu_deploy.yml
-#     - include_tasks: tasks/isu/isu_challenge.yml
+#     - include_tasks: tasks/tools/collect.yml
 
 # - name: isu3
 #   hosts: isu3
@@ -50,5 +49,4 @@
 #   vars_files:
 #     - env.yml
 #   tasks:
-#     - include_tasks: tasks/isu/isu_deploy.yml
-#     - include_tasks: tasks/isu/isu_challenge.yml
+#     - include_tasks: tasks/tools/collect.yml

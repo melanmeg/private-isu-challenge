@@ -1,9 +1,10 @@
+# バッククォート使うと構文エラーになるので注意
 - name: shell
-  become: true
+  become: false
   shell: |
-    mysql -u isuconp -pisuconp isuconp -e "alter table `comments` add index `idx_post_id_created_at_desc` (`post_id`, `created_at` DESC);"
-    mysql -u isuconp -pisuconp isuconp -e "alter table `posts` add index `idx_created_at_desc` (`created_at` DESC);"
-    mysql -u isuconp -pisuconp isuconp -e "alter table `comments` add index `idx_user_id` (`user_id`);"
+    mysql -u isuconp -pisuconp isuconp -e "alter table comments add index idx_post_id_created_at_desc (post_id, created_at DESC);"
+    mysql -u isuconp -pisuconp isuconp -e "alter table posts add index idx_created_at_desc (created_at DESC);"
+    mysql -u isuconp -pisuconp isuconp -e "alter table comments add index idx_user_id (user_id);"
   ignore_errors: true
 
 - name: Copy
