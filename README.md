@@ -17,10 +17,23 @@ $ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index idx_post
 ```bash
 {"pass":true,"score":34720,"success":32646,"fail":0,"messages":[]}
 ```
-![httplog](./images/1.PNG)
+![httplog](./images/2.PNG)
 
 ### 静的ファイルをキャッシュ
-- https://github.com/melanmeg/private-isu-challenge/commit/9f8feaf67195e1fc3e1eb40347beea714852fab4
+```config
+  location ~ .*\.(ico|css|js|img) {
+    expires 1d;
+    add_header Cache-Control public;
+  }
+```
+```bash
+{"pass":true,"score":34846,"success":32802,"fail":0,"messages":[]}
+```
+![httplog](./images/3.PNG)
+
+### 画像ファイル取得時と同時にすべて書き出す。/image/* にマッチするリクエストを画像ファイルが存在する場合はそのファイルを返す（キャッシュも有効）
+- https://github.com/melanmeg/private-isu-challenge/commit/9665894c45f6c09bdfaf2efbc1dd09de8acbf144
+- https://github.com/melanmeg/private-isu-challenge/commit/d7053047c2a1fac6ab9f1d6888ee28125f2eca4e
 ```bash
 ```
 
@@ -32,12 +45,6 @@ $ mysql -u isuconp -pisuconp isuconp -e "alter table posts add index idx_created
 ```
 
 ### posts, usersをjoin. LIMIT 20
-```bash
-```
-
-### 画像ファイル取得時と同時にすべて書き出す。/image/* にマッチするリクエストを画像ファイルが存在する場合はそのファイルを返す（キャッシュも有効）
-- https://github.com/melanmeg/private-isu-challenge/commit/9665894c45f6c09bdfaf2efbc1dd09de8acbf144
-- https://github.com/melanmeg/private-isu-challenge/commit/d7053047c2a1fac6ab9f1d6888ee28125f2eca4e
 ```bash
 ```
 
