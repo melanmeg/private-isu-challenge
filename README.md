@@ -6,7 +6,9 @@
 
 ### 初期スコア
 ```bash
+{"pass":true,"score":4193,"success":4037,"fail":0,"messages":[]}
 ```
+![slowQuery](./images/1.PNG)
 
 ### commentsテーブル idx_post_id_created_at_desc 追加
 ```bash
