@@ -18,6 +18,8 @@ services:
       - mock
     ports:
       - 9000:9000
+    volumes:
+      - ./data:/opt/pprotein/data
 
   phpmyadmin:
     image: phpmyadmin
