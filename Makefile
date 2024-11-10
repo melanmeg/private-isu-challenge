@@ -43,13 +43,3 @@ git-setup:
 
 	# deploykeyの作成
 	ssh-keygen -t ed25519 -C "" -f ~/.ssh/id_ed25519 -N ""
-
-# private-isuでGOROOT空だったので、そのような場合にGoをインストールする
-.PHONY: go-reinstall
-go-reinstall:
-	sudo rm -rf /usr/local/go
-	$(eval TAR_FILENAME := $(shell curl -fsSL 'https://go.dev/dl/?mode=json' | jq -r '.[0].files[] | select(.os == "linux" and .arch == "amd64" and .kind == "archive") | .filename'))
-	$(eval URL := $(shell echo https://go.dev/dl/$(TAR_FILENAME)))
-	curl -fsSL $(URL) -o /tmp/go.tar.gz
-	sudo tar -C /usr/local -xzf /tmp/go.tar.gz
-	rm -f /tmp/go.tar.gz
