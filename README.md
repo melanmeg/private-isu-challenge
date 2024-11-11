@@ -10,9 +10,9 @@
 ```
 ![slowlog](./images/1.PNG)
 
-### commentsテーブル idx_post_id_created_at_desc 追加
+### commentsテーブル comments_idx_1 追加
 ```bash
-$ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index idx_post_id_created_at_desc (post_id, created_at DESC);"
+$ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index comments_idx_1 (post_id, created_at DESC);"
 ```
 ```bash
 {"pass":true,"score":34720,"success":32646,"fail":0,"messages":[]}
@@ -63,14 +63,38 @@ mysql> EXPLAIN
 2 rows in set, 1 warning (0.00 sec)
 ```
 
-### commentsテーブル idx_user_id 追加
+### postsテーブル posts_idx_1 追加
 ```bash
-$ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index idx_user_id (user_id);"
+$ mysql -u isuconp -pisuconp isuconp -e "alter table posts add index posts_idx_1 (created_at DESC);"
+```
+```bash
+{"pass":true,"score":82680,"success":78917,"fail":0,"messages":[]}
+```
+```bash
+mysql> EXPLAIN SELECT p.id, p.user_id, p.body, p.mime, p.created_at FROM posts AS p JOIN users AS u ON (p.user_id = u.id) WHERE u.del_flg = 0 ORDER BY p.created_at DESC LIMIT 20;
++----+-------------+-------+------------+--------+---------------+---------------------+---------+-------------------+------+----------+-------------+
+| id | select_type | table | partitions | type   | possible_keys | key                 | key_len | ref               | rows | filtered | Extra       |
++----+-------------+-------+------------+--------+---------------+---------------------+---------+-------------------+------+----------+-------------+
+|  1 | SIMPLE      | p     | NULL       | index  | NULL          | idx_created_at_desc | 4       | NULL              |  199 |   100.00 | NULL        |
+|  1 | SIMPLE      | u     | NULL       | eq_ref | PRIMARY       | PRIMARY             | 4       | isuconp.p.user_id |    1 |    10.00 | Using where |
++----+-------------+-------+------------+--------+---------------+---------------------+---------+-------------------+------+----------+-------------+
+2 rows in set, 1 warning (0.00 sec)
+```
+![httplog](./images/5.PNG)
+![httplog](./images/5_2.PNG)
+
+### commentsテーブル comments_idx_2 追加
+```bash
+$ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index comments_idx_2 (user_id);"
 ```
 ```bash
 ```
 
-### postsテーブル idx_created_at_desc 追加. force indexを追加.
+### N+1クエリ結果をmemcachedでキャッシュする
+```bash
+```
+
+### postsテーブル posts_idx_2 追加. force indexを追加.
 ```bash
 # メモ) ここで以下のようなクエリが上位にくるはず
 SELECT p.id, p.user_id, p.body, p.mime, p.created_at, u.account_name
@@ -83,7 +107,7 @@ ORDER BY p.created_at
 DESC LIMIT 20
 ```
 ```bash
-$ mysql -u isuconp -pisuconp isuconp -e "alter table posts add index idx_created_at_desc (created_at DESC);"
+$ mysql -u isuconp -pisuconp isuconp -e "alter table posts add index posts_idx_2 (user_id, created_at DESC);"
 ```
 ```bash
 ```
