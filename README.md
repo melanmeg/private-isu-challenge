@@ -98,10 +98,10 @@ $ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index comments
 ![httplog](./images/6.PNG)
 ![httplog](./images/6_2.PNG)
 
-<!-- ### ログをやめてみる
+### ログをやめてみる
 ```bash
 {"pass":true,"score":179618,"success":172416,"fail":0,"messages":[]}
-``` -->
+```
 
 ---
 
