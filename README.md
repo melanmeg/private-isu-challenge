@@ -88,6 +88,7 @@ mysql> EXPLAIN SELECT p.id, p.user_id, p.body, p.mime, p.created_at FROM posts A
 $ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index comments_idx_2 (user_id);"
 ```
 ```bash
+{"pass":true,"score":86961,"success":83035,"fail":0,"messages":[]}
 ```
 
 ### N+1クエリ結果をmemcachedでキャッシュする
