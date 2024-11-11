@@ -103,6 +103,12 @@ $ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index comments
 {"pass":true,"score":179618,"success":172416,"fail":0,"messages":[]}
 ```
 
+### 内部ネットワークからベンチ、nginxにkeepalived設定
+```bash
+{"pass":true,"score":207649,"success":200667,"fail":0,"messages":[]}
+```
+![httplog](./images/7.PNG)
+
 ---
 
 ## 環境構築
