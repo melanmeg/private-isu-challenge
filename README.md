@@ -91,27 +91,17 @@ $ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index comments
 {"pass":true,"score":86961,"success":83035,"fail":0,"messages":[]}
 ```
 
-### N+1クエリ結果をmemcachedでキャッシュする
+### N+1クエリ結果と遅いクエリ結果をmemcachedでキャッシュする
 ```bash
+{"pass":true,"score":171163,"success":164317,"fail":0,"messages":[]}
 ```
+![httplog](./images/6.PNG)
+![httplog](./images/6_2.PNG)
 
-### postsテーブル posts_idx_2 追加. force indexを追加.
+<!-- ### ログをやめてみる
 ```bash
-# メモ) ここで以下のようなクエリが上位にくるはず
-SELECT p.id, p.user_id, p.body, p.mime, p.created_at, u.account_name
-FROM posts AS p
-JOIN users AS u
-ON (p.user_id = u.id)
-WHERE p.user_id ='85'
-AND u.del_flg = 0
-ORDER BY p.created_at
-DESC LIMIT 20
-```
-```bash
-$ mysql -u isuconp -pisuconp isuconp -e "alter table posts add index posts_idx_2 (user_id, created_at DESC);"
-```
-```bash
-```
+{"pass":true,"score":179618,"success":172416,"fail":0,"messages":[]}
+``` -->
 
 ---
 

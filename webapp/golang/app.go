@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bytes"
 	crand "crypto/rand"
+	"encoding/gob"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
@@ -23,7 +26,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/sessions"
 	"github.com/jmoiron/sqlx"
-	"github.com/kaz/pprotein/integration/standalone"
 )
 
 var (
@@ -173,46 +175,92 @@ func getFlash(w http.ResponseWriter, r *http.Request, key string) string {
 	}
 }
 
+// キャッシュ判定・取得関数
+func getCachedData[T any](mc *memcache.Client,key string, dbQueryFunc func() (T, error)) (T, error) {
+	var data T
+	item, err := mc.Get(key)
+	if err == nil {
+		// キャッシュからデコード
+		err = json.Unmarshal(item.Value, &data)
+		if err == nil {
+			return data, nil
+		}
+	}
+
+	// キャッシュがないかデコードエラーの場合、DBから取得
+	data, err = dbQueryFunc()
+	if err != nil {
+		return data, err
+	}
+
+	// キャッシュに保存
+	dataBytes, _ := json.Marshal(data)
+	mc.Set(&memcache.Item{Key: key, Value: dataBytes, Expiration: 60}) // 秒単位で指定
+	return data, nil
+}
+
+// results -> `id`, `user_id`, `body`, `mime`, `created_at`
 func makePosts(results []Post, csrfToken string, allComments bool) ([]Post, error) {
 	var posts []Post
+	var err error
+	// memcachedへ接続
+	mc := memcache.New("127.0.0.1:11211")
 
+	// 投稿の数、ループ
 	for _, p := range results {
-		err := db.Get(&p.CommentCount, "SELECT COUNT(*) AS `count` FROM `comments` WHERE `post_id` = ?", p.ID)
+		// 投稿のコメント数を取得（キャッシュを確認）
+		commentCountKey := fmt.Sprintf("post:%d:comment_count", p.ID)
+		p.CommentCount, err = getCachedData(mc, commentCountKey, func() (int, error) {
+			var count int
+			err := db.Get(&count, "SELECT COUNT(*) AS `count` FROM `comments` WHERE `post_id` = ?", p.ID)
+			return count, err
+		})
 		if err != nil {
 			return nil, err
 		}
 
-		query := "SELECT * FROM `comments` WHERE `post_id` = ? ORDER BY `created_at` DESC"
-		if !allComments {
-			query += " LIMIT 3"
-		}
-		var comments []Comment
-		err = db.Select(&comments, query, p.ID)
+		// 投稿の全コメントを取得（キャッシュを確認）
+		commentsKey := fmt.Sprintf("post:%d:comments:%t", p.ID, allComments)
+		p.Comments, err = getCachedData(mc, commentsKey, func() ([]Comment, error) {
+			query := "SELECT * FROM `comments` WHERE `post_id` = ? ORDER BY `created_at` DESC"
+			if !allComments {
+				query += " LIMIT 3"
+			}
+			var comments []Comment
+			err := db.Select(&comments, query, p.ID)
+			return comments, err
+		})
 		if err != nil {
 			return nil, err
 		}
 
-		for i := 0; i < len(comments); i++ {
-			err := db.Get(&comments[i].User, "SELECT * FROM `users` WHERE `id` = ?", comments[i].UserID)
+		// 投稿のコメントの数、ループ
+		for i := range p.Comments {
+			// 投稿のコメントのユーザー情報を取得（キャッシュを確認）
+			userKey := fmt.Sprintf("user:%d", p.Comments[i].UserID)
+			p.Comments[i].User, err = getCachedData(mc, userKey, func() (User, error) {
+				var user User
+				err := db.Get(&user, "SELECT * FROM `users` WHERE `id` = ?", p.Comments[i].UserID)
+				return user, err
+			})
 			if err != nil {
 				return nil, err
 			}
 		}
 
-		// reverse
-		for i, j := 0, len(comments)-1; i < j; i, j = i+1, j-1 {
-			comments[i], comments[j] = comments[j], comments[i]
-		}
-
-		p.Comments = comments
-
-		err = db.Get(&p.User, "SELECT * FROM `users` WHERE `id` = ?", p.UserID)
+		// 投稿のユーザー情報を取得（キャッシュを確認）
+		userKey := fmt.Sprintf("user:%d", p.UserID)
+		p.User, err = getCachedData(mc, userKey, func() (User, error) {
+			var user User
+			err := db.Get(&user, "SELECT * FROM `users` WHERE `id` = ?", p.UserID)
+			return user, err
+		})
 		if err != nil {
 			return nil, err
 		}
 
+		// その他の処理
 		p.CSRFToken = csrfToken
-
 		if p.User.DelFlg == 0 {
 			posts = append(posts, p)
 		}
@@ -511,6 +559,7 @@ func getAccountName(w http.ResponseWriter, r *http.Request) {
 }
 
 func getPosts(w http.ResponseWriter, r *http.Request) {
+	// クエリパラメータを解析
 	m, err := url.ParseQuery(r.URL.RawQuery)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -522,19 +571,56 @@ func getPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 時間のパース
 	t, err := time.Parse(ISO8601Format, maxCreatedAt)
 	if err != nil {
 		log.Print(err)
 		return
 	}
 
-	results := []Post{}
-	err = db.Select(&results, "SELECT `id`, `user_id`, `body`, `mime`, `created_at` FROM `posts` WHERE `created_at` <= ? ORDER BY `created_at` DESC", t.Format(ISO8601Format))
-	if err != nil {
-		log.Print(err)
-		return
+	// memcachedへ接続
+	mc := memcache.New("127.0.0.1:11211")
+
+	// キャッシュのキーを作成（maxCreatedAtを使用）
+	cacheKey := fmt.Sprintf("posts:%s", t.Format(ISO8601Format))
+
+	// memcachedからキャッシュを取得
+	item, err := mc.Get(cacheKey)
+	var results []Post
+	if err == nil && item != nil {
+		// キャッシュからデータを取得した場合
+		buffer := bytes.NewReader(item.Value)
+		decoder := gob.NewDecoder(buffer)
+		err = decoder.Decode(&results)
+		if err != nil {
+			log.Print("Failed to decode cache data:", err)
+			results = nil
+		}
 	}
 
+	if len(results) == 0 {
+		// キャッシュにデータがなかった場合、データベースから取得
+		err = db.Select(&results, "SELECT `id`, `user_id`, `body`, `mime`, `created_at` FROM `posts` WHERE `created_at` <= ? ORDER BY `created_at` DESC", t.Format(ISO8601Format))
+		if err != nil {
+			log.Print(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		// データベースから取得したデータをキャッシュに保存
+		var buffer bytes.Buffer
+		encoder := gob.NewEncoder(&buffer)
+		err := encoder.Encode(results)
+		if err == nil {
+			mc.Set(&memcache.Item{
+				Key:        cacheKey,
+				Value:      buffer.Bytes(),
+				Expiration: 60 * 5, // キャッシュの有効期限（例: 5分）
+			})
+		}
+	}
+
+	// データをテンプレートで表示
 	posts, err := makePosts(results, getCSRFToken(r), false)
 	if err != nil {
 		log.Print(err)
@@ -899,10 +985,10 @@ func main() {
 	})
 
 	// pproteinデバッグサーバーを起動
-	go func() {
-		log.Println("Starting pprotein debug server on :6060")
-		standalone.Integrate(":6060")
-	}()
+	// go func() {
+	// 	log.Println("Starting pprotein debug server on :6060")
+	// 	standalone.Integrate(":6060")
+	// }()
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
