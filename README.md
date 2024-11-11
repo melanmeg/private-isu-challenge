@@ -44,6 +44,23 @@ $ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index idx_post
 ### posts, usersをjoin. LIMIT 20
 - https://github.com/melanmeg/private-isu-challenge/commit/bc1662d5c64f324286c2258b1dd07fa670041a9b
 ```bash
+{"pass":true,"score":72393,"success":69147,"fail":0,"messages":[]}
+```
+```bash
+mysql> EXPLAIN
+    -> SELECT p.id, p.user_id, p.body, p.mime, p.created_at
+    -> FROM posts AS p
+    -> JOIN users AS u ON (p.user_id = u.id)
+    -> WHERE u.del_flg = 0
+    -> ORDER BY p.created_at DESC
+    -> LIMIT 20;
++----+-------------+-------+------------+--------+---------------+---------+---------+-------------------+------+----------+----------------+
+| id | select_type | table | partitions | type   | possible_keys | key     | key_len | ref               | rows | filtered | Extra          |
++----+-------------+-------+------------+--------+---------------+---------+---------+-------------------+------+----------+----------------+
+|  1 | SIMPLE      | p     | NULL       | ALL    | NULL          | NULL    | NULL    | NULL              | 9791 |   100.00 | Using filesort |
+|  1 | SIMPLE      | u     | NULL       | eq_ref | PRIMARY       | PRIMARY | 4       | isuconp.p.user_id |    1 |    10.00 | Using where    |
++----+-------------+-------+------------+--------+---------------+---------+---------+-------------------+------+----------+----------------+
+2 rows in set, 1 warning (0.00 sec)
 ```
 
 ### commentsテーブル idx_user_id 追加
