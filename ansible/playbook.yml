@@ -16,19 +16,19 @@
     - include_tasks: tasks/tools/netdata.yml
     - include_tasks: tasks/tools/pprotein.yml
     - include_tasks: tasks/tools/sysctl.yml
-
-- name: isu1
-  hosts: isu1
-  gather_facts: false
-  user: "{{ ISUCON_USER }}"
-  become: false
-  max_fail_percentage: 0
-  vars_files:
-    - env.yml
-  tasks:
-    - include_tasks: tasks/tools/collect.yml
-    - include_tasks: tasks/tools/fetch.yml
-    - include_tasks: tasks/tools/graphviz.yml
+#
+# - name: isu1
+#   hosts: isu1
+#   gather_facts: false
+#   user: "{{ ISUCON_USER }}"
+#   become: false
+#   max_fail_percentage: 0
+#   vars_files:
+#     - env.yml
+#   tasks:
+#     - include_tasks: tasks/tools/collect.yml
+#     - include_tasks: tasks/tools/fetch.yml
+#     - include_tasks: tasks/tools/graphviz.yml
 #
 # - name: isu2
 #   hosts: isu2

@@ -27,6 +27,7 @@
   shell: make
   args:
     chdir: "{{ BUILD_DIR }}"
+  ignore_errors: true
 
 - name: "{{ SERVICE_NAME }} is restarted"
   become: yes
