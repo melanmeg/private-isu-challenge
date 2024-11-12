@@ -109,6 +109,22 @@ $ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index comments
 ```
 ![httplog](./images/7.PNG)
 
+### サーバー分割
+```bash
+{"pass":true,"score":437170,"success":424398,"fail":0,"messages":[]}
+```
+```bash
+# 構成
+isu1: nginx, app
+isu2: app, memcached
+isu3: mysql
+```
+
+### 不要なログ、サービスを止める
+```bash
+{"pass":true,"score":442852,"success":429990,"fail":0,"messages":[]}
+```
+
 ---
 
 ## 環境構築
