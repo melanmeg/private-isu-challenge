@@ -7,15 +7,16 @@
   vars_files:
     - env.yml
   tasks:
-    - include_tasks: tasks/isu/isu_deploy.yml
-    - include_tasks: tasks/isu/isu_challenge.yml
     - include_tasks: tasks/tools/common.yml
     - include_tasks: tasks/tools/nginx.yml
     - include_tasks: tasks/tools/mysql.yml
     - include_tasks: tasks/tools/memcached.yml
     - include_tasks: tasks/tools/netdata.yml
+    - include_tasks: tasks/tools/graphviz.yml
     - include_tasks: tasks/tools/pprotein.yml
     - include_tasks: tasks/tools/sysctl.yml
+    - include_tasks: tasks/isu/isu_deploy.yml
+    - include_tasks: tasks/isu/isu_challenge.yml
 #
 # - name: isu1
 #   hosts: isu1
@@ -28,7 +29,6 @@
 #   tasks:
 #     - include_tasks: tasks/tools/collect.yml
 #     - include_tasks: tasks/tools/fetch.yml
-#     - include_tasks: tasks/tools/graphviz.yml
 #
 # - name: isu2
 #   hosts: isu2

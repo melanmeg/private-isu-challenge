@@ -17,17 +17,19 @@
     enabled: true
 
 - name: Pull latest code from Git repository
+  become: no
   git:
     repo: "{{ GIT_REPOSITORY_URL }}"
     dest: "{{ ISUCON_DIR }}"
     version: "main"
     force: true
 
+# Execute as login shell
 - name: setup
-  shell: make
+  become: no
+  shell: bash -lc "sh setup.sh"
   args:
     chdir: "{{ BUILD_DIR }}"
-  ignore_errors: true
 
 - name: "{{ SERVICE_NAME }} is restarted"
   become: yes

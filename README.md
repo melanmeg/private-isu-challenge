@@ -82,11 +82,52 @@ mysql> EXPLAIN SELECT p.id, p.user_id, p.body, p.mime, p.created_at FROM posts A
 ```
 ![httplog](./images/5.PNG)
 ![httplog](./images/5_2.PNG)
+![slowlog](./images/s.PNG)
 
 ### commentsテーブル comments_idx_2 追加
 ```bash
+mysql> EXPLAIN SELECT COUNT(*) AS `count` FROM `comments` WHERE `user_id` = 382 \G
+*************************** 1. row ***************************
+           id: 1
+  select_type: SIMPLE
+        table: comments
+   partitions: NULL
+         type: ALL
+possible_keys: NULL
+          key: NULL
+      key_len: NULL
+          ref: NULL
+         rows: 99590
+     filtered: 10.00
+        Extra: Using where
+1 row in set, 1 warning (0.00 sec)
+```
+
+```bash
 $ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index comments_idx_2 (user_id);"
 ```
+
+```bash
+mysql> EXPLAIN SELECT COUNT(*) AS `count` FROM `comments` WHERE `user_id` = 382 \G
+*************************** 1. row ***************************
+           id: 1
+  select_type: SIMPLE
+        table: comments
+   partitions: NULL
+         type: ref
+possible_keys: comments_idx_2
+          key: comments_idx_2
+      key_len: 4
+          ref: const
+         rows: 102
+     filtered: 100.00
+        Extra: Using index
+1 row in set, 1 warning (0.00 sec)
+```
+
+![slowlog](./images/s2.PNG)
+
+
 ```bash
 {"pass":true,"score":86961,"success":83035,"fail":0,"messages":[]}
 ```
@@ -95,8 +136,10 @@ $ mysql -u isuconp -pisuconp isuconp -e "alter table comments add index comments
 ```bash
 {"pass":true,"score":171163,"success":164317,"fail":0,"messages":[]}
 ```
-![httplog](./images/6.PNG)
-![httplog](./images/6_2.PNG)
+
+![slowlog](./images/6.PNG)
+![slowlog](./images/6_2.PNG)
+![slowlog](./images/6_3.PNG)
 
 ### ログをやめてみる
 ```bash
@@ -153,6 +196,7 @@ $ curl -fsSL "$URL" -o /tmp/go.tar.gz && \
 $ cat <<EOF >> ~/.bashrc
 export GOROOT=/usr/local/go
 export GOPATH=$HOME/go
+export PATH=/usr/local/go/bin:$PATH
 EOF
 ```
 
